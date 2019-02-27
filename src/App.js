@@ -1,24 +1,23 @@
 import React, { Component } from 'react';
+import Navigation from './Navigation'
 import Search from './Components/Search'
+import MapDisplay from './Components/MapDisplay'
+import AlertBox from './AlertBox'
+import './App.css'
 import { connect } from 'react-redux'
 
 class App extends Component {
 
-  renderResults = () => {
-    return this.props.searchResults.map(restaurant =>
-        <div>
-        <a href={restaurant.url}> {restaurant.name}</a>
-        <img src={restaurant.image_url} />
-        <p>{restaurant.price}</p>
-      </div>
-    )
+  state = {
+    open: false
   }
 
   render() {
     return (
       <div className="App">
-        <Search />
-        {this.renderResults()}
+        <Navigation/>
+        {this.props.currentList ? <Search/> : <AlertBox/>}
+        <MapDisplay/>
       </div>
     );
   }
@@ -26,7 +25,7 @@ class App extends Component {
 
 function mapStateToProps(state) {
   return {
-    searchResults: state.searchResults
+    currentList: state.currentList
   }
 }
 

@@ -1,18 +1,49 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import InputBase from '@material-ui/core/InputBase';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import SearchIcon from '@material-ui/icons/Search';
+import DirectionsIcon from '@material-ui/icons/Directions';
+
 import { connect } from 'react-redux'
 
 const searchUrl = 'http://localhost:3000/api/v1/yelp'
 
+const styles = {
+  root: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: 400,
+  },
+  input: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  divider: {
+    width: 1,
+    height: 28,
+    margin: 4,
+  },
+};
+
+
 class Search extends React.Component {
 
   state = {
-    searchTerm: "",
-    searchLocation: ""
+    searchTerm: ""
   }
 
   handleOnChange = (event) => {
     this.setState({
-      [event.target.name]: event.target.value
+      searchTerm: event.target.value
     })
   }
 
@@ -26,7 +57,7 @@ class Search extends React.Component {
       },
       body: JSON.stringify({
         searchTerm: this.state.searchTerm,
-        searchLocation: this.state.searchLocation
+        searchLocation: this.props.currentList.location_area
       })
     })
     .then(response => response.json())
@@ -36,24 +67,41 @@ class Search extends React.Component {
   }
 
   render() {
+    const { classes } = this.props
+
     return (
-      <form id="search-form" onChange={this.handleOnChange} onSubmit={this.handleOnSubmit}>
-      <label>
-        Search:
-      <input type="text" name="searchTerm" />
-      </label>
-      <label>
-        Location:
-      <input type="text" name="searchLocation" />
-      </label>
-      <input type="submit" value="Submit" />
-    </form>
-    )
+      <div className="search">
+      <Paper className={classes.root} elevation={1}>
+      <InputBase onChange={this.handleOnChange}
+      className={classes.input} placeholder="Add places to your list" />
+      <IconButton className={classes.iconButton} aria-label="Search">
+      <SearchIcon />
+      </IconButton>
+      <Divider className={classes.divider} />
+      <IconButton onClick={this.handleOnSubmit} color="primary" className={classes.iconButton} aria-label="Directions">
+      <DirectionsIcon/>
+      </IconButton>
+      </Paper>
+      </div>
+    );
   }
 }
 
-const mapDispatchToProps = {
-  setResults: (payload) => ({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+Search.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+function mapStateToProps(state) {
+  return {
+    currentList: state.currentList
+  }
 }
 
-export default connect(null, mapDispatchToProps)(Search)
+function mapDispatchToProps(dispatch) {
+  return {
+    setResults: (payload) => { dispatch({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+    }
+  }
+}
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Search))

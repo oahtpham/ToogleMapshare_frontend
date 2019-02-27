@@ -31,3 +31,25 @@
     transform: rotate(360deg);
   }
 }
+
+.locationImage {
+  height: 150px;
+  width: 160px;
+}
+
+/* star rating css */
+
+.checked {
+  color: orange;
+}
+
+.search {
+  margin-top: 70px;
+  margin-left: 10px;
+  position: absolute;
+  z-index: 2;
+}
+
+.map {
+  z-index: 1;
+}
