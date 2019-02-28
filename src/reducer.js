@@ -1,26 +1,47 @@
 const defaultState = {
   searchResults: [],
+  mapLocation: [39.047695, -95.578568],
   currentUser: 1,
   openNewListForm: false,
   openNewReviewForm: false,
+  openNewPinForm: false,
+  successfulPinAlert: false,
   currentList: null,
-  currentMarker: null
+  currentMarker: null,
+  allLists: [],
+  allPins: [],
+  mapZoom: 5
 }
 
 export default function reducer(state = defaultState, action) {
   switch(action.type) {
-    case "CURRENT_SEARCH_RESULTS":
-      return {...state, searchResults: action.payload}
     case "CURRENT_USER":
       return {...state, currentUser: action.payload}
-    case "OPEN_NEW_LIST_FORM" :
-      return {...state, openNewListForm: !state.openNewListForm}
-    case "OPEN_NEW_REVIEW_FORM" :
-      return {...state, openNewReviewForm: !state.openNewReviewForm}
     case "CURRENT_LIST" :
       return {...state, currentList: action.payload}
     case "CURRENT_MARKER" :
       return {...state, currentMarker: action.payload}
+
+    case "CURRENT_SEARCH_RESULTS":
+      return {...state, searchResults: action.payload}
+    case "SET_ALL_LISTS" :
+      return {...state, allLists: action.payload}
+    case "ADD_NEW_LIST" :
+      return {...state, allLists: [...state.allLists, action.payload]}
+    case "SET_ALL_PINS" :
+      return {...state, allPins: action.payload}
+
+    case "OPEN_NEW_LIST_FORM" :
+      return {...state, openNewListForm: !state.openNewListForm}
+    case "OPEN_NEW_REVIEW_FORM" :
+      return {...state, openNewReviewForm: !state.openNewReviewForm}
+    case "OPEN_NEW_PIN_FORM" :
+      return {...state, openNewPinForm: !state.openNewPinForm}
+    case "OPEN_SUCCESSFUL_PIN_ALERT" :
+      return {...state, successfulPinAlert: !state.successfulPinAlert}
+    case "SET_MAP_LOCATION" :
+      return {...state, mapLocation: action.payload.mapLocation, mapZoom: action.payload.mapZoom}
+
     default:
       return state
   }

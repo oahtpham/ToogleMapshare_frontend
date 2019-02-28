@@ -54,6 +54,7 @@ class NewListForm extends React.Component {
       .then(response => response.json())
       .then(obj => {
         this.props.listDetails(obj)
+        this.props.addNewList(obj)
         this.props.toggleForm()
       })
       .then(() => {
@@ -125,6 +126,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     listDetails: (payload) => {
       dispatch({type: "CURRENT_LIST", payload: payload})
+    },
+    addNewList: (payload) => {
+      dispatch({type: "ADD_NEW_LIST", payload: payload})
     }
   }
 }

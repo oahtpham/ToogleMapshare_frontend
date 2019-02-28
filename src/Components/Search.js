@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
+import PinsContainer2 from '../Containers/PinsContainer2'
 
 import { connect } from 'react-redux'
 
@@ -71,17 +72,14 @@ class Search extends React.Component {
 
     return (
       <div className="search">
-      <Paper className={classes.root} elevation={1}>
-      <InputBase onChange={this.handleOnChange}
-      className={classes.input} placeholder="Add places to your list" />
-      <IconButton className={classes.iconButton} aria-label="Search">
-      <SearchIcon />
-      </IconButton>
-      <Divider className={classes.divider} />
-      <IconButton onClick={this.handleOnSubmit} color="primary" className={classes.iconButton} aria-label="Directions">
-      <DirectionsIcon/>
-      </IconButton>
-      </Paper>
+        <Paper className={classes.root} elevation={1}>
+        <InputBase onChange={this.handleOnChange}
+        className={classes.input} placeholder="Search places to add to your list" />
+        <IconButton onClick={this.handleOnSubmit} className={classes.iconButton} aria-label="Search">
+          <SearchIcon />
+        </IconButton>
+        </Paper>
+        {this.props.searchResults.length === 0 ? null : <PinsContainer2/>}
       </div>
     );
   }
@@ -93,7 +91,8 @@ Search.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    currentList: state.currentList
+    currentList: state.currentList,
+    searchResults: state.searchResults
   }
 }
 

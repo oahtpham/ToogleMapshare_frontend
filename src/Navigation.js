@@ -13,23 +13,42 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import InputBase from '@material-ui/core/InputBase';
+import { fade } from '@material-ui/core/styles/colorManipulator';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import SearchIcon from '@material-ui/icons/Search';
+import ListIcon from '@material-ui/icons/List'
+import AddBoxIcon from '@material-ui/icons/AddBox'
+
+
 import { connect } from 'react-redux'
+
+
+//nested_list
+import Collapse from '@material-ui/core/Collapse';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 
 import NewListForm from './Components/NewListForm'
 
+
+const listsURL = 'http://localhost:3000/api/v1/lists'
+
 const drawerWidth = 240;
 
 const styles = theme => ({
   root: {
     display: 'flex',
+    width: '100%'
+  },
+  grow: {
+    flexGrow: 1
   },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
@@ -90,12 +109,71 @@ const styles = theme => ({
     width: 60,
     height: 60,
   },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    marginRight: 10,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing.unit,
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    width: theme.spacing.unit * 9,
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+    width: '100%',
+  },
+  inputInput: {
+    paddingTop: theme.spacing.unit,
+    paddingRight: theme.spacing.unit,
+    paddingBottom: theme.spacing.unit,
+    paddingLeft: theme.spacing.unit * 10,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: 120,
+      '&:focus': {
+        width: 200,
+      },
+    },
+  },
+  nested: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
 });
 
 class Navigation extends React.Component {
   state = {
     open: false,
+    latitude: null,
+    longitude: null,
+    searchLocation: null,
+    openNested: false
   };
+
+  componentDidMount() {
+    fetch(listsURL)
+    .then(resp => resp.json())
+    .then(obj => {
+      const userLists = obj.filter(list => list.user.id === this.props.currentUser)
+      console.log(obj)
+      this.props.setAllLists(userLists)
+    })
+  }
 
   handleDrawerOpen = () => {
     this.setState({ open: true });
@@ -112,10 +190,45 @@ class Navigation extends React.Component {
     })
   }
 
+  handleAllListsClick = () => {
+    this.setState(state => ({
+      openNested: !state.openNested
+    }));
+  };
+
+  handleListClick = (list) => {
+    this.props.setCurrentList(list)
+    this.handleDrawerClose()
+  }
+
+  handleSearchInput = (event) => {
+    this.setState({
+      searchLocation: event.target.value
+    }, () => console.log(this.state.searchLocation))
+  }
+
+  handleSearch = (e) => {
+    if (e.key === "Enter") {
+      // this.setState(STATERESET)
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${this.state.searchLocation}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
+      .then(response => response.json())
+      .then(geolocation => {
+        this.setState({
+          latitude: geolocation.results[0].geometry.location.lat,
+          longitude: geolocation.results[0].geometry.location.lng
+        }, () => console.log(this.state))
+      })
+      .then(() => {
+        this.props.setMapLocation({mapLocation:[this.state.latitude, this.state.longitude], mapZoom: 13 })
+      })
+    }
+  }
+
   render() {
     const { classes, theme } = this.props;
     const { open } = this.state;
 
+    console.log(this.props.allLists)
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -137,6 +250,27 @@ class Navigation extends React.Component {
             <Typography variant="h6" color="inherit" noWrap>
               {this.props.currentList ? this.props.currentList.title : 'shareIt'}
             </Typography>
+            <div className={classes.grow} />
+            <div className={classes.search} >
+             <div className={classes.searchIcon}>
+               <SearchIcon />
+             </div>
+             <InputBase
+               placeholder="Search Location"
+               onKeyDown={this.handleSearch}
+               onChange={this.handleSearchInput}
+               classes={{
+                 root: classes.inputRoot,
+                 input: classes.inputInput,
+               }}
+             />
+           </div>
+            <IconButton
+              aria-haspopup="true"
+              color="inherit"
+            >
+              <Avatar alt="User" src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.smallAvatar} />
+          </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -151,26 +285,38 @@ class Navigation extends React.Component {
           <div className={classes.drawerHeader}>
             <IconButton onClick={this.handleDrawerClose}>
               <Avatar alt="User" src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.bigAvatar} />
-              {"Hi, Thao!"}
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </div>
           <Divider />
           <List>
               <ListItem button key="createList" onClick={this.handleNewListClick}>
-                <ListItemIcon><MailIcon /></ListItemIcon>
+                <ListItemIcon><AddBoxIcon /></ListItemIcon>
                 <ListItemText primary="Create New List" />
               </ListItem>
               <NewListForm />
           </List>
           <Divider />
           <List>
-            {['All Lists', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem button key={text}>
-                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
+            <ListItem button key='All Lists' onClick={this.handleAllListsClick}>
+              <ListItemIcon>
+                <ListIcon />
+              </ListItemIcon>
+              <ListItemText primary='All Lists' />
+              {this.state.openNested ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={this.state.openNested} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {this.props.allLists.map(list => (
+                  <ListItem onClick={() => this.handleListClick(list)} button className={classes.nested}>
+                    <ListItemIcon>
+                      <ListIcon />
+                    </ListItemIcon>
+                    <ListItemText inset primary={list.title}/>
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
           </List>
         </Drawer>
       </div>
@@ -185,7 +331,9 @@ Navigation.propTypes = {
 
 function mapStateToProps (state) {
   return {
-    currentList: state.currentList
+    currentList: state.currentList,
+    allLists: state.allLists,
+    currentUser: state.currentUser
   }
 }
 
@@ -193,7 +341,16 @@ function mapDispatchToProps (dispatch) {
   return {
     toggleForm: () => {
       dispatch({type: "OPEN_NEW_LIST_FORM"})
-    }
+    },
+    setMapLocation: (payload) => {
+      dispatch({type: "SET_MAP_LOCATION", payload: payload})
+    },
+    setCurrentList: (payload) => {
+      dispatch({type:"CURRENT_LIST", payload: payload})
+    },
+    setAllLists: (payload) => {
+      dispatch({type:"SET_ALL_LISTS", payload: payload})
+    },
   }
 }
 

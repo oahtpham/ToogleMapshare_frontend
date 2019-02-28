@@ -1,11 +1,11 @@
-import React, {Component} from 'react'
+import React from 'react'
 
-import { Map, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
-import Search from './Search'
+import { Map, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet'
 import L from 'leaflet';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Icon from '@material-ui/core/Icon';
+import NewPinForm from './NewPinForm'
 
 import NewReviewForm from './NewReviewForm'
 
@@ -17,17 +17,14 @@ const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 class MapDisplay extends React.Component {
 
   state = {
-    showAllPins: true,
-    allPins: []
+    showAllPins: true
   }
 
   componentDidMount() {
     fetch(pinsURL)
     .then(resp => resp.json())
     .then(obj => {
-      this.setState({
-        allPins: obj
-      })
+      this.props.setAllPins(obj)
     })
   }
 
@@ -43,15 +40,15 @@ class MapDisplay extends React.Component {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-          yelp_id: this.props.currentMarker.id,
-          name: this.props.currentMarker.name,
-          address: this.props.currentMarker.location.display_address.join(' '),
-          latitude: this.props.currentMarker.coordinates.latitude,
-          longitude: this.props.currentMarker.coordinates.longitude,
-          img_url: this.props.currentMarker.image_url,
-          yelp_url: this.props.currentMarker.url,
-          yelp_rating: this.props.currentMarker.rating,
-          price: this.props.currentMarker.price
+        yelp_id: this.props.currentMarker.id,
+        name: this.props.currentMarker.name,
+        address: this.props.currentMarker.location.display_address.join(' '),
+        latitude: this.props.currentMarker.coordinates.latitude,
+        longitude: this.props.currentMarker.coordinates.longitude,
+        img_url: this.props.currentMarker.image_url,
+        yelp_url: this.props.currentMarker.url,
+        yelp_rating: this.props.currentMarker.rating,
+        price: this.props.currentMarker.price
       })
     })
     .then(resp => resp.json())
@@ -69,19 +66,23 @@ class MapDisplay extends React.Component {
         })
       })
     })
+    .then()
   }
 
   handleReviewClick = () => {
     this.props.toggleReviewForm()
   }
 
+  handlePinClickWithoutList = () => {
+    this.props.togglePinForm()
+  }
 
   renderAllPinnedLocations = () => {
     let greenIcon = new L.Icon({
       iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
       iconSize: [18, 30],
     });
-      return this.state.allPins.map(pin => {
+      return this.props.allPins.map(pin => {
         const position = [pin.place.latitude, pin.place.longitude]
 
         const rating = Math.floor(pin.place.yelp_rating)
@@ -115,7 +116,8 @@ class MapDisplay extends React.Component {
               {uncheckedStars()}
               <br/>
               <br/>
-              <Button onClick={this.handlePinClick} variant="contained" color='primary' size="small" aria-label="Add">
+              <NewPinForm/>
+              <Button onClick={this.handlePinClickWithoutList} variant="contained" color='primary' size="small" aria-label="Add">
                 <AddIcon />
                  Pin
               </Button>
@@ -184,14 +186,12 @@ class MapDisplay extends React.Component {
   }
 
    render() {
-     console.log(this.props.currentMarker)
-     console.log(this.props.open)
-     const position = [39.047695, -95.578568]
+     console.log(this.props)
      return (
-         <Map className='map' style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.currentList ? [this.props.currentList.latitude, this.props.currentList.longitude] : position} zoom={this.props.currentList? 13 : 5} zoomControl={false}>
+         <Map className='map' style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.currentList ? [this.props.currentList.latitude, this.props.currentList.longitude] : this.props.mapLocation} zoom={this.props.currentList ? 13 : this.props.mapZoom} zoomControl={false}>
            <TileLayer
-             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+             url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
            />
            {this.state.showAllPins ? this.renderAllPinnedLocations() : null}
            {this.renderPins()}
@@ -208,7 +208,11 @@ function mapStateToProps(state) {
     searchResults: state.searchResults,
     currentList: state.currentList,
     currentMarker: state.currentMarker,
-    open: state.openNewReviewForm
+    open: state.openNewReviewForm,
+    openPinForm: state.openNewPinForm,
+    mapLocation: state.mapLocation,
+    mapZoom: state.mapZoom,
+    allPins: state.allPins
   }
 }
 
@@ -219,6 +223,12 @@ function mapDispatchToProps(dispatch) {
     },
     toggleReviewForm: () => {
       dispatch({type:"OPEN_NEW_REVIEW_FORM"})
+    },
+    togglePinForm: () => {
+      dispatch({type: "OPEN_NEW_PIN_FORM"})
+    },
+    setAllPins: (payload) => {
+      dispatch({type:"SET_ALL_PINS", payload: payload})
     }
   }
 }
