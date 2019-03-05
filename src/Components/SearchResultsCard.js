@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Icon from '@material-ui/core/Icon';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import GridListTile from '@material-ui/core/GridListTile';
 import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
@@ -22,12 +23,13 @@ import NewReviewForm from './NewReviewForm'
 
 import { connect } from 'react-redux'
 
+const yelpLogo = 'https://www.logolynx.com/images/logolynx/87/8724b62c2a14845bafd396ce6620d534.png'
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
 const styles = theme => ({
   card: {
-    maxWidth: 400,
+    maxWidth: 350,
   },
   media: {
     height: 270,
@@ -37,7 +39,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 367,
+    width: 318,
     textAlign: 'center'
   },
   pinnedUser: {
@@ -48,6 +50,9 @@ const styles = theme => ({
     backgroundColor: 'white',
     textColor: 'gray'
   },
+  subheader: {
+    textAlign: 'center'
+  }
 });
 
 
@@ -141,7 +146,6 @@ class SearchResultsCard extends React.Component {
 
   pinnedUsers = (location, classes) => {
     const notUserPins = this.filterPinnedLocations(location).filter(pin => pin.user.id !== this.props.currentList.user.id)
-    console.log(this.props.searchResults)
     if (this.filterPinnedLocations(location).length >= 1 && notUserPins.length !== 0) {
       const pinLabel1 = `${notUserPins[0].user.username} pinned this`
       const pinLabel2 = `${notUserPins[0].user.username} and ${notUserPins.length-1} other(s) pinned this`
@@ -165,6 +169,10 @@ class SearchResultsCard extends React.Component {
     this.setState({
       showReviews: !this.state.showReviews
     })
+  }
+
+  handleClickCardMapZoom = (location) => {
+    this.props.setMapLocation({mapLocation: [location.coordinates.latitude, location.coordinates.longitude], mapZoom: 15})
   }
 
   reviewsMap = (location, classes) => {
@@ -204,6 +212,7 @@ class SearchResultsCard extends React.Component {
   }
 
   searchCards = () => {
+    console.log("inside searchCards");
     const { classes } = this.props;
       return this.props.searchResults.map(location => {
         const totalReviews = `${this.props.allReviews.filter(review => review.place.yelp_id === location.id).length} Review(s)`
@@ -213,7 +222,7 @@ class SearchResultsCard extends React.Component {
             cols={3}>
             <Card
               className={classes.card}
-              onMouseOver={null}>
+              onClick={() => this.handleClickCardMapZoom(location)}>
               <CardActionArea>
                 <CardMedia
                   component="img"
@@ -306,10 +315,32 @@ class SearchResultsCard extends React.Component {
   }
 
   render() {
+    console.log("currentList", this.props.currentList)
+    console.log("in render currentMarker", this.props.currentMarker);;
     const { classes } = this.props;
     return (
       <div>
-        {this.props.currentList ? this.searchCards() : null }
+        <GridListTile
+        key="Subheader"
+        cols={2}
+        style={{ height: 'auto'}}>
+        <ListSubheader
+          className={classes.subheader}
+          component="div">
+        <Chip
+          avatar={
+            <Avatar
+              alt='yelpLogo'
+              src={yelpLogo}
+              className={classes.avatar}/>}
+            label='Results'
+            className={classes.chip}
+         />
+        </ListSubheader>
+        </GridListTile >
+        <GridListTile>
+          {this.props.currentList ? this.searchCards() : null}
+        </GridListTile>
         {this.props.openNewReviewForm ? <NewReviewForm searchPin={this.state.searchPinDetails}/> : null}
       </div>
     );
@@ -329,7 +360,8 @@ const mapStateToProps = (state) => {
     allPins: state.allPins,
     allReviews: state.allReviews,
     currentListPins: state.currentListPins,
-    openNewReviewForm: state.openNewReviewForm
+    openNewReviewForm: state.openNewReviewForm,
+    markerDetailsDisplay: state.markerDetailsDisplay
   }
 }
 
@@ -352,6 +384,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     setMarker: (payload) => {
       dispatch({type:"CURRENT_MARKER", payload: payload})
+    },
+    setMapLocation: (payload) => {
+      dispatch({type: "SET_MAP_LOCATION", payload: payload})
     },
   }
 }

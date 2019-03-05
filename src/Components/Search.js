@@ -19,7 +19,7 @@ const styles = {
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
-    width: 400,
+    width: 350,
   },
   input: {
     marginLeft: 8,
@@ -117,7 +117,10 @@ function mapDispatchToProps(dispatch) {
     },
     setSearchTerm: (payload) => {
       dispatch({type: 'SET_SEARCH_TERM', payload: payload})
-    }
+    },
+    setMapLocation: (payload) => {
+      dispatch({type: "SET_MAP_LOCATION", payload: payload})
+    },
   }
 }
 

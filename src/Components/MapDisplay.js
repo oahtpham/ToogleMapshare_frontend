@@ -15,6 +15,7 @@ import { connect } from 'react-redux'
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 const reviewsURL = 'http://localhost:3000/api/v1/reviews'
+const searchUrl = 'http://localhost:3000/api/v1/yelp'
 
 const redIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -37,7 +38,6 @@ class MapDisplay extends React.Component {
 
   state = {
     showAllPins: true,
-    markerClicked: false
   }
 
   componentDidMount() {
@@ -56,21 +56,48 @@ class MapDisplay extends React.Component {
     })
   }
 
-  currentMarker = (location) => {
-    this.setState({
-      markerClicked: !this.state.markerClicked
-    })
-    if (!this.state.markerClicked) {
-      this.props.setMarker(location)
-    } else {
-      this.props.setMarker(null)
+  handleOnChange = (event) => {
+    this.props.setSearchTerm(event.target.value)
+    if (this.props.searchTerm === "") {
+      this.props.setResults([])
     }
   }
 
-  renderCard = (pin) => {
-    console.log(pin)
+  fetchResults = () => {
+    console.log(this.props.searchTerm);
+    fetch(searchUrl, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        searchTerm: this.props.searchTerm,
+        searchLocation: this.props.currentList.location_area
+      })
+    })
+    .then(response => response.json())
+    .then(obj => {
+      console.log(obj);
+      this.props.setResults(obj)
+    })
   }
 
+  showCurrentMarker = (location) => {
+    if (this.props.currentList) {
+      this.props.setSearchTerm(location.place.name)
+      this.fetchResults()
+    } else {
+    this.props.showMarkerDisplay()
+    this.props.setMarker(location)
+    }
+  }
+
+  hideCurrentMarker = () => {
+    this.props.hideMarkerDisplay()
+    this.props.setMarker(null)
+    this.props.setSearchTerm("")
+  }
 
   renderAllPinnedLocations = () => {
       return this.props.showPins.map(pin => {
@@ -79,7 +106,7 @@ class MapDisplay extends React.Component {
           <div>
             <Marker
               key={pin.id}
-              onClick={() => this.currentMarker(pin)}
+              onClick={() => this.showCurrentMarker(pin)}
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               position={position}
@@ -151,6 +178,7 @@ class MapDisplay extends React.Component {
         return (
           <div>
             <Marker
+              onClick={() => this.showCurrentMarker(pin)}
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               key={pin.id}
@@ -180,15 +208,15 @@ class MapDisplay extends React.Component {
   }
 
    render() {
-     console.log(this.props.currentMarker);
      return (
         <div>
           <div className="pinsContainer">
-            {this.props.currentMarker ? <PinsContainer/> : null}
+            {this.props.currentMarker && !this.props.currentList ? <PinsContainer/> : null}
           </div>
            <Map
+            onClick={this.hideCurrentMarker}
             className='map'
-            style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.currentList ? [this.props.currentList.latitude, this.props.currentList.longitude] : this.props.mapLocation} zoom={this.props.currentList ? 13 : this.props.mapZoom}
+            style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.mapLocation} zoom={this.props.mapZoom}
             zoomControl={false}>
              <TileLayer
                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
@@ -219,7 +247,8 @@ function mapStateToProps(state) {
     mapZoom: state.mapZoom,
     allPins: state.allPins,
     allReviews: state.allReviews,
-    showPins: state.showPins
+    showPins: state.showPins,
+    markerDetailsDisplay: state.markerDetailsDisplay
   }
 }
 
@@ -236,6 +265,18 @@ function mapDispatchToProps(dispatch) {
     },
     setAllReviews: (payload) => {
       dispatch({type:"SET_ALL_REVIEWS", payload: payload})
+    },
+    showMarkerDisplay: () => {
+      dispatch({type: "DISPLAY_MARKER_ON"})
+    },
+    hideMarkerDisplay: () => {
+      dispatch({type: "DISPLAY_MARKER_OFF"})
+    },
+    setResults: (payload) => {
+      dispatch({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+    },
+    setSearchTerm: (payload) => {
+      dispatch({type: 'SET_SEARCH_TERM', payload: payload})
     },
   }
 }

@@ -9,8 +9,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import HomeIcon from '@material-ui/icons/Home';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InputBase from '@material-ui/core/InputBase';
@@ -218,6 +220,7 @@ class Navigation extends React.Component {
     this.props.setCurrentListPins(pinDetails)
     this.handleDrawerClose()
     this.props.setSearchTerm("")
+    this.props.setMapLocation({mapLocation: [list.latitude, list.longitude], mapZoom: 13})
   }
 
   handleSearchInput = (event) => {
@@ -241,6 +244,13 @@ class Navigation extends React.Component {
         this.props.setMapLocation({mapLocation:[this.state.latitude, this.state.longitude], mapZoom: 13 })
       })
     }
+  }
+
+  homeClick = () => {
+    this.props.clearList()
+    this.props.setResults([])
+    this.props.setMapLocation({mapLocation: [39.047695, -95.578568], mapZoom: 5})
+    this.props.setMarker(null)
   }
 
   render() {
@@ -281,7 +291,15 @@ class Navigation extends React.Component {
              <div className={classes.searchIcon}>
                <SearchIcon />
              </div>
-             {this.props.currentList ? null :
+             {this.props.currentList ?
+              <Button
+                onClick={this.homeClick}
+                variant="contained"
+                color="secondary"
+                size='small'
+                className={classes.button}>
+                <HomeIcon className={classes.rightIcon} />
+              </Button> :
              <InputBase
                placeholder="Search Location"
                onKeyDown={this.handleSearch}
@@ -406,6 +424,15 @@ function mapDispatchToProps (dispatch) {
     },
     setSearchTerm: (payload) => {
       dispatch({type: 'SET_SEARCH_TERM', payload: payload})
+    },
+    clearList: () => {
+      dispatch({type: "CLEAR_LIST"})
+    },
+    setResults: (payload) => {
+      dispatch({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+    },
+    setMarker: (payload) => {
+      dispatch({type: "CURRENT_MARKER", payload: payload})
     }
   }
 }

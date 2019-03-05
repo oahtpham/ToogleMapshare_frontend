@@ -7,6 +7,7 @@ const defaultState = {
   openNewReviewForm: false,
   openNewPinForm: false,
   successfulPinAlert: false,
+  markerDetailsDisplay: false,
   currentList: null,
   currentListPins: [],
   currentMarker: null,
@@ -59,6 +60,12 @@ export default function reducer(state = defaultState, action) {
       return {...state, openNewPinForm: !state.openNewPinForm}
     case "OPEN_SUCCESSFUL_PIN_ALERT" :
       return {...state, successfulPinAlert: !state.successfulPinAlert}
+    case "DISPLAY_MARKER_ON" :
+      return {...state, markerDetailsDisplay: true}
+    case "DISPLAY_MARKER_OFF" :
+      return {...state, markerDetailsDisplay: false}
+    case "CLEAR_LIST" :
+      return {...state, currentList: null}
 
     default:
       return state

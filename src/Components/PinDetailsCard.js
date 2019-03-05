@@ -13,6 +13,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Icon from '@material-ui/core/Icon';
 import GridListTile from '@material-ui/core/GridListTile';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
@@ -24,7 +25,7 @@ const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
 const styles = theme => ({
   card: {
-    maxWidth: 400,
+    maxWidth: 350,
   },
   media: {
     height: 270,
@@ -34,7 +35,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 367,
+    width: 318,
     textAlign: 'center'
   },
   pinnedUser: {
@@ -45,6 +46,9 @@ const styles = theme => ({
     backgroundColor: 'white',
     textColor: 'gray'
   },
+  subheader: {
+    textAlign: 'center'
+  }
 });
 
 
@@ -184,6 +188,16 @@ class PinDetailsCard extends React.Component {
     const totalReviews = `${this.props.allReviews.filter(review => review.place.yelp_id === this.props.currentMarker.place.yelp_id).length} Friend Reviews`
     return (
       <div>
+        <GridListTile
+        key="Subheader"
+        cols={2}
+        style={{ height: 'auto'}}>
+          <ListSubheader
+            className={classes.subheader}
+            component="div">
+            Restaurant Details
+          </ListSubheader>
+        </GridListTile>
         <GridListTile key={this.props.currentMarker.place.id} cols={3} >
           <Card className={classes.card} >
             <CardActionArea>
@@ -215,7 +229,9 @@ class PinDetailsCard extends React.Component {
                  <Typography
                   gutterbottom="true"
                   variant='body1'>
-                  {this.props.currentMarker.place.address ? this.props.currentMarker.place.address : null}><br/>
+                  {this.props.currentMarker.place.address}<br/>
+                  {this.props.currentMarker.place.city}, {this.props.currentMarker.place.state}<br/>
+                  {this.props.currentMarker.place.zip_code}
                  </Typography>
                 {this.pinnedUsers(this.props.currentMarker, classes)}<br/>
                 {totalReviews === '0 Friend Reviews' ?
@@ -226,8 +242,15 @@ class PinDetailsCard extends React.Component {
                     className={classes.button}>
                     No Friend Reviews
                   </Button> :
-                  this.reviewsMap(this.props.currentMarker, classes)
-                }
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    size="large"
+                    disabled
+                    className={classes.button}>
+                    All Reviews
+                  </Button>}
+                  {this.reviewsMap(this.props.currentMarker, classes)}
                 <CardActions>
                   {this.props.currentListPins.filter(pin => pin.place.yelp_id === this.props.currentMarker.place.yelp_id).length !== 0 ?
                   <Button
@@ -275,6 +298,7 @@ PinDetailsCard.propTypes = {
 const mapStateToProps = (state) => {
   return {
     currentMarker: state.currentMarker,
+    currentUser: state.currentUser,
     searchResults: state.searchResults,
     currentList: state.currentList,
     allPins: state.allPins,
