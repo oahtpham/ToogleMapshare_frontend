@@ -56,8 +56,6 @@ class NewPinForm extends React.Component {
   }
 
   render() {
-    console.log(this.props.currentList)
-    console.log(this.props.currentMarker)
     return (
       <div>
         <Dialog
@@ -86,10 +84,14 @@ class NewPinForm extends React.Component {
           </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.props.toggleForm} color="primary">
+            <Button
+            onClick={this.props.toggleForm}
+            color="primary">
               Close
             </Button>
-            <Button onClick={this.handleSubmit} color="primary">
+            <Button
+              onClick={this.handleSubmit}
+              color="primary">
               Pin to List
             </Button>
           </DialogActions>
@@ -98,8 +100,6 @@ class NewPinForm extends React.Component {
       </div>
     );
   }
-
-
 }
 
 const mapStateToProps = (state) => {

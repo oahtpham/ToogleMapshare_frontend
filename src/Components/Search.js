@@ -8,7 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
-import PinsContainer2 from '../Containers/PinsContainer2'
+import PinsContainer from '../Containers/PinsContainer'
 
 import { connect } from 'react-redux'
 
@@ -38,18 +38,14 @@ const styles = {
 
 class Search extends React.Component {
 
-  state = {
-    searchTerm: ""
-  }
-
   handleOnChange = (event) => {
-    this.setState({
-      searchTerm: event.target.value
-    })
+    this.props.setSearchTerm(event.target.value)
+    if (this.props.searchTerm === "") {
+      this.props.setResults([])
+    }
   }
 
-  handleOnSubmit =  (event) => {
-    event.preventDefault()
+  fetchResults = () => {
     fetch(searchUrl, {
       method: "POST",
       headers: {
@@ -57,7 +53,7 @@ class Search extends React.Component {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        searchTerm: this.state.searchTerm,
+        searchTerm: this.props.searchTerm,
         searchLocation: this.props.currentList.location_area
       })
     })
@@ -67,19 +63,36 @@ class Search extends React.Component {
     })
   }
 
+  handleKeyDown =  (event) => {
+    if (event.key === "Enter") {
+      this.fetchResults()
+    }
+  }
+
+  handleClick = () => {
+    this.fetchResults()
+  }
+
   render() {
     const { classes } = this.props
-
     return (
       <div className="search">
-        <Paper className={classes.root} elevation={1}>
-        <InputBase onChange={this.handleOnChange}
-        className={classes.input} placeholder="Search places to add to your list" />
-        <IconButton onClick={this.handleOnSubmit} className={classes.iconButton} aria-label="Search">
+        <Paper
+          className={classes.root}
+          elevation={1}>
+        <InputBase
+          onChange={this.handleOnChange}
+          onKeyDown={this.handleKeyDown}
+          className={classes.input}
+          placeholder="Search places to add to your list" />
+        <IconButton
+          onClick={this.handleClick}
+          className={classes.iconButton}
+          aria-label="Search">
           <SearchIcon />
         </IconButton>
         </Paper>
-        {this.props.searchResults.length === 0 ? null : <PinsContainer2/>}
+        {this.props.searchResults.length === 0 || this.props.searchTerm === "" ? null : <PinsContainer/>}
       </div>
     );
   }
@@ -92,13 +105,18 @@ Search.propTypes = {
 function mapStateToProps(state) {
   return {
     currentList: state.currentList,
-    searchResults: state.searchResults
+    searchResults: state.searchResults,
+    searchTerm: state.searchTerm
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    setResults: (payload) => { dispatch({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+    setResults: (payload) => {
+      dispatch({type: 'CURRENT_SEARCH_RESULTS', payload: payload})
+    },
+    setSearchTerm: (payload) => {
+      dispatch({type: 'SET_SEARCH_TERM', payload: payload})
     }
   }
 }

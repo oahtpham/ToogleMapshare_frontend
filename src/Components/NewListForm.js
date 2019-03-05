@@ -99,10 +99,14 @@ class NewListForm extends React.Component {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.props.toggleForm} color="primary">
+            <Button
+              onClick={this.props.toggleForm}
+              color="primary">
               Close
             </Button>
-            <Button onClick={this.handleSubmit} color="primary">
+            <Button
+              onClick={this.handleSubmit}
+              color="primary">
               Create New List
             </Button>
           </DialogActions>

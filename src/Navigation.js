@@ -18,10 +18,13 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
+import DetailsIcon from '@material-ui/icons/Details';
 import SearchIcon from '@material-ui/icons/Search';
 import ListIcon from '@material-ui/icons/List'
 import AddBoxIcon from '@material-ui/icons/AddBox'
+import Switch from '@material-ui/core/Switch';
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 
 import { connect } from 'react-redux'
@@ -39,6 +42,7 @@ import NewListForm from './Components/NewListForm'
 
 
 const listsURL = 'http://localhost:3000/api/v1/lists'
+const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
 const drawerWidth = 240;
 
@@ -162,7 +166,8 @@ class Navigation extends React.Component {
     latitude: null,
     longitude: null,
     searchLocation: null,
-    openNested: false
+    openNested: false,
+    toggleSwitch: true,
   };
 
   componentDidMount() {
@@ -170,9 +175,19 @@ class Navigation extends React.Component {
     .then(resp => resp.json())
     .then(obj => {
       const userLists = obj.filter(list => list.user.id === this.props.currentUser)
-      console.log(obj)
       this.props.setAllLists(userLists)
     })
+  }
+
+  handleSwitch = () => {
+    this.setState({
+      toggleSwitch: !this.state.toggleSwitch
+    })
+    if (!this.state.toggleSwitch) {
+      this.props.setShowPins(this.props.allPins)
+    } else {
+      this.props.setShowPins([])
+    }
   }
 
   handleDrawerOpen = () => {
@@ -198,13 +213,17 @@ class Navigation extends React.Component {
 
   handleListClick = (list) => {
     this.props.setCurrentList(list)
+    const listPins = list.pinned_locations.map(pin => pin.id)
+    const pinDetails = this.props.allPins.filter(pin => listPins.includes(pin.id))
+    this.props.setCurrentListPins(pinDetails)
     this.handleDrawerClose()
+    this.props.setSearchTerm("")
   }
 
   handleSearchInput = (event) => {
     this.setState({
       searchLocation: event.target.value
-    }, () => console.log(this.state.searchLocation))
+    })
   }
 
   handleSearch = (e) => {
@@ -227,8 +246,6 @@ class Navigation extends React.Component {
   render() {
     const { classes, theme } = this.props;
     const { open } = this.state;
-
-    console.log(this.props.allLists)
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -247,14 +264,24 @@ class Navigation extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="inherit" noWrap>
+            <Typography
+              variant="h6"
+              color="inherit"
+              noWrap>
               {this.props.currentList ? this.props.currentList.title : 'shareIt'}
             </Typography>
+            <Tooltip title={this.state.toggleSwitch ? "Hide Friends' Pins" : "Show Friends' Pins"}>
+              <Switch
+                checked={this.state.toggleSwitch}
+                onChange={this.handleSwitch}
+              />
+            </Tooltip>
             <div className={classes.grow} />
             <div className={classes.search} >
              <div className={classes.searchIcon}>
                <SearchIcon />
              </div>
+             {this.props.currentList ? null :
              <InputBase
                placeholder="Search Location"
                onKeyDown={this.handleSearch}
@@ -263,13 +290,15 @@ class Navigation extends React.Component {
                  root: classes.inputRoot,
                  input: classes.inputInput,
                }}
-             />
+             />}
            </div>
             <IconButton
               aria-haspopup="true"
               color="inherit"
             >
-              <Avatar alt="User" src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.smallAvatar} />
+              <Avatar
+                alt="User"
+                src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.smallAvatar} />
           </IconButton>
           </Toolbar>
         </AppBar>
@@ -284,13 +313,18 @@ class Navigation extends React.Component {
         >
           <div className={classes.drawerHeader}>
             <IconButton onClick={this.handleDrawerClose}>
-              <Avatar alt="User" src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.bigAvatar} />
+              <Avatar
+                alt="User"
+                src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.bigAvatar} />
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </div>
           <Divider />
           <List>
-              <ListItem button key="createList" onClick={this.handleNewListClick}>
+              <ListItem
+                button
+                key="createList"
+                onClick={this.handleNewListClick}>
                 <ListItemIcon><AddBoxIcon /></ListItemIcon>
                 <ListItemText primary="Create New List" />
               </ListItem>
@@ -298,17 +332,28 @@ class Navigation extends React.Component {
           </List>
           <Divider />
           <List>
-            <ListItem button key='All Lists' onClick={this.handleAllListsClick}>
+            <ListItem
+              button
+              key='All Lists'
+              onClick={this.handleAllListsClick}>
               <ListItemIcon>
-                <ListIcon />
+                <DetailsIcon />
               </ListItemIcon>
               <ListItemText primary='All Lists' />
               {this.state.openNested ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={this.state.openNested} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
+            <Collapse
+              in={this.state.openNested}
+              timeout="auto"
+              unmountOnExit>
+              <List
+                component="div"
+                disablePadding>
                 {this.props.allLists.map(list => (
-                  <ListItem onClick={() => this.handleListClick(list)} button className={classes.nested}>
+                  <ListItem
+                    onClick={() => this.handleListClick(list)}
+                    button
+                    className={classes.nested}>
                     <ListItemIcon>
                       <ListIcon />
                     </ListItemIcon>
@@ -333,7 +378,9 @@ function mapStateToProps (state) {
   return {
     currentList: state.currentList,
     allLists: state.allLists,
-    currentUser: state.currentUser
+    currentUser: state.currentUser,
+    allPins: state.allPins,
+    currentListPins: state.currentListPins
   }
 }
 
@@ -351,6 +398,15 @@ function mapDispatchToProps (dispatch) {
     setAllLists: (payload) => {
       dispatch({type:"SET_ALL_LISTS", payload: payload})
     },
+    setShowPins: (payload) => {
+      dispatch({type:"SET_SHOW_PINS", payload: payload})
+    },
+    setCurrentListPins: (payload) => {
+      dispatch({type: "CURRENT_LIST_PINS", payload: payload})
+    },
+    setSearchTerm: (payload) => {
+      dispatch({type: 'SET_SEARCH_TERM', payload: payload})
+    }
   }
 }
 

@@ -5,19 +5,39 @@ import L from 'leaflet';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Icon from '@material-ui/core/Icon';
-import NewPinForm from './NewPinForm'
+import StarRatings from 'react-star-ratings'
 
-import NewReviewForm from './NewReviewForm'
+import PinsContainer from '../Containers/PinsContainer'
+
 
 import { connect } from 'react-redux'
 
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
+const reviewsURL = 'http://localhost:3000/api/v1/reviews'
+
+const redIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  iconSize: [18, 30],
+});
+let blueIcon = new L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png',
+  iconSize: [18, 30], // size of the icon
+});
+let greenIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  iconSize: [18, 30],
+});
+let yellowIcon = new L.Icon({
+  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  iconSize: [18, 30],
+});
 
 class MapDisplay extends React.Component {
 
   state = {
-    showAllPins: true
+    showAllPins: true,
+    markerClicked: false
   }
 
   componentDidMount() {
@@ -25,106 +45,60 @@ class MapDisplay extends React.Component {
     .then(resp => resp.json())
     .then(obj => {
       this.props.setAllPins(obj)
+      this.props.setShowPins(obj)
+    })
+    .then(() => {
+      fetch(reviewsURL)
+      .then(resp => resp.json())
+      .then(obj => {
+        this.props.setAllReviews(obj)
+      })
     })
   }
 
   currentMarker = (location) => {
-    this.props.setMarker(location)
-  }
-
-  handlePinClick = () => {
-    fetch(placesURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        yelp_id: this.props.currentMarker.id,
-        name: this.props.currentMarker.name,
-        address: this.props.currentMarker.location.display_address.join(' '),
-        latitude: this.props.currentMarker.coordinates.latitude,
-        longitude: this.props.currentMarker.coordinates.longitude,
-        img_url: this.props.currentMarker.image_url,
-        yelp_url: this.props.currentMarker.url,
-        yelp_rating: this.props.currentMarker.rating,
-        price: this.props.currentMarker.price
-      })
+    this.setState({
+      markerClicked: !this.state.markerClicked
     })
-    .then(resp => resp.json())
-    .then(() => {
-      fetch(pinsURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: 1,
-          list_id: this.props.currentList.id,
-          yelp_id: this.props.currentMarker.id
-        })
-      })
-    })
-    .then()
+    if (!this.state.markerClicked) {
+      this.props.setMarker(location)
+    } else {
+      this.props.setMarker(null)
+    }
   }
 
-  handleReviewClick = () => {
-    this.props.toggleReviewForm()
+  renderCard = (pin) => {
+    console.log(pin)
   }
 
-  handlePinClickWithoutList = () => {
-    this.props.togglePinForm()
-  }
 
   renderAllPinnedLocations = () => {
-    let greenIcon = new L.Icon({
-      iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-      iconSize: [18, 30],
-    });
-      return this.props.allPins.map(pin => {
+      return this.props.showPins.map(pin => {
         const position = [pin.place.latitude, pin.place.longitude]
-
-        const rating = Math.floor(pin.place.yelp_rating)
-        var i
-
-        function checkedStars() {
-          let checkedSpans = []
-          for (i = 0; i < rating ; i++) {
-            checkedSpans.push(<span className="fa fa-star checked"></span>)
-          }
-          return checkedSpans
-        }
-
-        function uncheckedStars() {
-          let uncheckedSpans = []
-          for (i = 0; i < (5-rating) ; i++) {
-            uncheckedSpans.push(<span className="fa fa-star"></span>)
-          }
-          return uncheckedSpans
-        }
-
         return (
           <div>
-            <Marker onClick={() => this.currentMarker(pin)} key={pin.id} position={position} icon={greenIcon}>
-            <Popup >
-              <img className="locationImage" src={pin.place.img_url}/>
+            <Marker
+              key={pin.id}
+              onClick={() => this.currentMarker(pin)}
+              onMouseOver={(e) => e.target.openPopup()}
+              onMouseOut={(e) => e.target.closePopup()}
+              position={position}
+              icon={pin.user.id === this.props.currentUser ? greenIcon : redIcon }>
+              <Popup>
+                {pin.place.img_url ? <img className="locationImage" src={ pin.place.img_url}/> : null}
+                <br/>
+                <h3>{pin.place.name}</h3>
+                <p>{pin.place.address}<br/>
+                {pin.place.city}, {pin.place.state} {pin.place.zip_code}</p>
+                <StarRatings
+                 rating={pin.place.yelp_rating}
+                 starRatedColor="orange"
+                 numberOfStars={5}
+                 starDimension="12px"
+                 starSpacing="1px"
+                 name='rating'
+               />
               <br/>
-              <a href={pin.place.yelp_url} target="_blank">{pin.place.name}</a>
-              <p>{pin.place.price}</p>
-              {checkedStars()}
-              {uncheckedStars()}
-              <br/>
-              <br/>
-              <NewPinForm/>
-              <Button onClick={this.handlePinClickWithoutList} variant="contained" color='primary' size="small" aria-label="Add">
-                <AddIcon />
-                 Pin
-              </Button>
-              <Button onClick={this.handleReviewClick} variant="contained" color="secondary" size="small" aria-label="Edit">
-                <Icon>edit_icon</Icon>
-                 Review
-              </Button>
               </Popup>
             </Marker>
           </div>
@@ -132,52 +106,33 @@ class MapDisplay extends React.Component {
       })
   }
 
-  renderPins = () => {
-    let searchResultsIcon = new L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png',
-      iconSize: [18, 30], // size of the icon
-    });
+  renderSearchPins = () => {
     return this.props.searchResults.map(location => {
       const position = [location.coordinates.latitude, location.coordinates.longitude]
-      const rating = Math.floor(location.rating)
-      var i
-
-      function checkedStars() {
-        let checkedSpans = []
-        for (i = 0; i < rating ; i++) {
-          checkedSpans.push(<span className="fa fa-star checked"></span>)
-        }
-        return checkedSpans
-      }
-
-      function uncheckedStars() {
-        let uncheckedSpans = []
-        for (i = 0; i < (5-rating) ; i++) {
-          uncheckedSpans.push(<span className="fa fa-star"></span>)
-        }
-        return uncheckedSpans
-      }
-
       return (
         <div>
-          <Marker onClick={() => this.currentMarker(location)}key={location.id} position={position} icon={searchResultsIcon}>
+          <Marker
+            onClick={null}
+            onMouseOver={(e) => e.target.openPopup()}
+            onMouseOut={(e) => e.target.closePopup()}
+            key={location.id}
+            position={position}
+            icon={this.props.currentListPins.filter(pin => pin.place.yelp_id === location.id).length === 0 ? blueIcon : greenIcon}>
             <Popup >
               <img className="locationImage" src={location.image_url}/>
               <br/>
-              <a href={location.url} target="_blank">{location.name}</a>
-              <p>{location.price}</p>
-              {checkedStars()}
-              {uncheckedStars()}
+              <h3>{location.name}</h3>
+              <p>{location.location.address1}<br/>
+              {location.location.city}, {location.location.state} {location.location.zip_code}</p>
+              <StarRatings
+               rating={location.rating}
+               starRatedColor="orange"
+               numberOfStars={5}
+               starDimension="12px"
+               starSpacing="1px"
+               name='rating'
+              />
               <br/>
-              <br/>
-              <Button onClick={this.handlePinClick} variant="contained" color='primary' size="small" aria-label="Add">
-                <AddIcon />
-                 Pin
-              </Button>
-              <Button onClick={this.handleReviewClick} variant="contained" color="secondary" size="small" aria-label="Edit">
-                <Icon>edit_icon</Icon>
-                 Review
-              </Button>
             </Popup>
           </Marker>
         </div>
@@ -185,19 +140,66 @@ class MapDisplay extends React.Component {
     })
   }
 
+  showCurrentListPins = () => {
+    if(this.props.currentList) {
+      let greenIcon = new L.Icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        iconSize: [18, 30],
+      });
+      return this.props.currentListPins.map(pin => {
+        const position = [pin.place.latitude, pin.place.longitude]
+        return (
+          <div>
+            <Marker
+              onMouseOver={(e) => e.target.openPopup()}
+              onMouseOut={(e) => e.target.closePopup()}
+              key={pin.id}
+              position={position}
+              icon={greenIcon}>
+              <Popup >
+                <img className="locationImage" src={pin.place.img_url}/>
+                <br/>
+                <h3>{pin.place.name}</h3>
+                <p>{pin.place.address}<br/>
+                {pin.place.city}, {pin.place.state} {pin.place.zip_code}</p>
+                <StarRatings
+                 rating={pin.place.yelp_rating}
+                 starRatedColor="orange"
+                 numberOfStars={5}
+                 starDimension="12px"
+                 starSpacing="1px"
+                 name='rating'
+               />
+                <br/>
+              </Popup>
+            </Marker>
+          </div>
+        )
+      })
+    }
+  }
+
    render() {
-     console.log(this.props)
+     console.log(this.props.currentMarker);
      return (
-         <Map className='map' style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.currentList ? [this.props.currentList.latitude, this.props.currentList.longitude] : this.props.mapLocation} zoom={this.props.currentList ? 13 : this.props.mapZoom} zoomControl={false}>
-           <TileLayer
-             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
-             url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-           />
-           {this.state.showAllPins ? this.renderAllPinnedLocations() : null}
-           {this.renderPins()}
-           <NewReviewForm/>
-           <ZoomControl position="topright"/>
-         </Map>
+        <div>
+          <div className="pinsContainer">
+            {this.props.currentMarker ? <PinsContainer/> : null}
+          </div>
+           <Map
+            className='map'
+            style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.currentList ? [this.props.currentList.latitude, this.props.currentList.longitude] : this.props.mapLocation} zoom={this.props.currentList ? 13 : this.props.mapZoom}
+            zoomControl={false}>
+             <TileLayer
+               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+               url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+             />
+             {this.renderAllPinnedLocations()}
+             {this.props.searchTerm === "" ? null : this.renderSearchPins()}
+             {this.showCurrentListPins()}
+             <ZoomControl position="topright"/>
+           </Map>
+         </div>
      )
    }
 
@@ -206,13 +208,18 @@ class MapDisplay extends React.Component {
 function mapStateToProps(state) {
   return {
     searchResults: state.searchResults,
+    searchTerm: state.searchTerm,
     currentList: state.currentList,
     currentMarker: state.currentMarker,
+    currentListPins: state.currentListPins,
+    currentUser: state.currentUser,
     open: state.openNewReviewForm,
     openPinForm: state.openNewPinForm,
     mapLocation: state.mapLocation,
     mapZoom: state.mapZoom,
-    allPins: state.allPins
+    allPins: state.allPins,
+    allReviews: state.allReviews,
+    showPins: state.showPins
   }
 }
 
@@ -221,15 +228,15 @@ function mapDispatchToProps(dispatch) {
     setMarker: (payload) => {
       dispatch({type:"CURRENT_MARKER", payload: payload})
     },
-    toggleReviewForm: () => {
-      dispatch({type:"OPEN_NEW_REVIEW_FORM"})
-    },
-    togglePinForm: () => {
-      dispatch({type: "OPEN_NEW_PIN_FORM"})
-    },
     setAllPins: (payload) => {
       dispatch({type:"SET_ALL_PINS", payload: payload})
-    }
+    },
+    setShowPins: (payload) => {
+      dispatch({type:"SET_SHOW_PINS", payload: payload})
+    },
+    setAllReviews: (payload) => {
+      dispatch({type:"SET_ALL_REVIEWS", payload: payload})
+    },
   }
 }
 
