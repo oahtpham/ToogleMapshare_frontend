@@ -9,7 +9,6 @@ import StarRatings from 'react-star-ratings'
 
 import PinsContainer from '../Containers/PinsContainer'
 
-
 import { connect } from 'react-redux'
 
 const placesURL = 'http://localhost:3000/api/v1/places'
@@ -64,7 +63,6 @@ class MapDisplay extends React.Component {
   }
 
   fetchResults = () => {
-    console.log(this.props.searchTerm);
     fetch(searchUrl, {
       method: "POST",
       headers: {
@@ -78,7 +76,6 @@ class MapDisplay extends React.Component {
     })
     .then(response => response.json())
     .then(obj => {
-      console.log(obj);
       this.props.setResults(obj)
     })
   }
@@ -87,6 +84,7 @@ class MapDisplay extends React.Component {
     if (this.props.currentList) {
       this.props.setSearchTerm(location.place.name)
       this.fetchResults()
+      this.props.setMarker(location)
     } else {
     this.props.showMarkerDisplay()
     this.props.setMarker(location)
@@ -96,7 +94,7 @@ class MapDisplay extends React.Component {
   hideCurrentMarker = () => {
     this.props.hideMarkerDisplay()
     this.props.setMarker(null)
-    this.props.setSearchTerm("")
+    this.props.setResults([])
   }
 
   renderAllPinnedLocations = () => {
@@ -133,8 +131,18 @@ class MapDisplay extends React.Component {
       })
   }
 
+  displayItem = () => {
+    if (this.props.currentMarker) {
+      return this.props.searchResults.filter(result => result.id === this.props.currentMarker.place.yelp_id)
+    } else if (this.props.searchCard){
+      return this.props.searchResults.filter(result => result.id === this.props.searchCard.id)
+    } else {
+    return this.props.searchResults
+    }
+  }
+
   renderSearchPins = () => {
-    return this.props.searchResults.map(location => {
+    return this.displayItem().map(location => {
       const position = [location.coordinates.latitude, location.coordinates.longitude]
       return (
         <div>
@@ -242,13 +250,13 @@ function mapStateToProps(state) {
     currentListPins: state.currentListPins,
     currentUser: state.currentUser,
     open: state.openNewReviewForm,
-    openPinForm: state.openNewPinForm,
     mapLocation: state.mapLocation,
     mapZoom: state.mapZoom,
     allPins: state.allPins,
     allReviews: state.allReviews,
     showPins: state.showPins,
-    markerDetailsDisplay: state.markerDetailsDisplay
+    markerDetailsDisplay: state.markerDetailsDisplay,
+    searchCard: state.searchCard
   }
 }
 

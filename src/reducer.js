@@ -8,6 +8,7 @@ const defaultState = {
   openNewPinForm: false,
   successfulPinAlert: false,
   markerDetailsDisplay: false,
+  searchCard: null,
   currentList: null,
   currentListPins: [],
   currentMarker: null,
@@ -36,9 +37,11 @@ export default function reducer(state = defaultState, action) {
     case "ADD_NEW_LIST" :
       return {...state, allLists: [...state.allLists, action.payload]}
     case "ADD_NEW_PIN" :
-      return {...state, currentListPins: [...state.currentListPins, action.payload]}
+      return {...state, currentListPins: [...state.currentListPins, action.payload], allPins: [...state.allPins, action.payload], showPins: [...state.showPins, action.payload]}
     case "ADD_NEW_REVIEW" :
       return {...state, allReviews: [...state.allReviews, action.payload]}
+    case "ADD_SEARCH_CARD" :
+      return {...state, searchCard: action.payload}
 
 
     case "SET_ALL_PINS" :

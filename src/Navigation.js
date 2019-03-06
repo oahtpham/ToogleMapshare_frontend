@@ -238,7 +238,7 @@ class Navigation extends React.Component {
         this.setState({
           latitude: geolocation.results[0].geometry.location.lat,
           longitude: geolocation.results[0].geometry.location.lng
-        }, () => console.log(this.state))
+        })
       })
       .then(() => {
         this.props.setMapLocation({mapLocation:[this.state.latitude, this.state.longitude], mapZoom: 13 })
@@ -331,9 +331,6 @@ class Navigation extends React.Component {
         >
           <div className={classes.drawerHeader}>
             <IconButton onClick={this.handleDrawerClose}>
-              <Avatar
-                alt="User"
-                src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.bigAvatar} />
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </div>

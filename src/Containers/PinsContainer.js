@@ -26,7 +26,7 @@ const styles = theme => ({
   },
   gridList: {
     display: 'flex',
-    width: 350,
+    width: 375,
     height: '85vh',
     textAlign:'left',
   },
@@ -60,7 +60,7 @@ class PinsContainer extends React.Component{
             <GridList
               cellHeight={180}
               className={classes.gridList}>
-              {this.props.currentMarker ? <PinDetailsCard /> : <SearchResultsCard />}
+              {this.props.currentList ? <SearchResultsCard /> : <PinDetailsCard />}
             </GridList>
           </div>
         </Paper>

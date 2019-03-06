@@ -56,20 +56,11 @@ class NewListForm extends React.Component {
         this.props.listDetails(obj)
         this.props.addNewList(obj)
         this.props.toggleForm()
-      })
-      .then(() => {
-        this.setState({
-          redirect: true
-        })
+        this.props.setMapLocation({mapLocation: [obj.latitude, obj.longitude], mapZoom: 13})
       })
     })
   }
 
-  renderRedirect = () => {
-    if (this.state.redirect) {
-      return <Redirect to='/listdisplay' />
-    }
-  }
 
   render() {
     return (
@@ -133,6 +124,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     addNewList: (payload) => {
       dispatch({type: "ADD_NEW_LIST", payload: payload})
+    },
+    setMapLocation: (payload) => {
+      dispatch({type: "SET_MAP_LOCATION", payload: payload})
     }
   }
 }

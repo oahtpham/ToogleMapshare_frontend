@@ -18,7 +18,6 @@ import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
-import NewPinForm from './NewPinForm'
 import NewReviewForm from './NewReviewForm'
 
 import { connect } from 'react-redux'
@@ -29,7 +28,7 @@ const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
 const styles = theme => ({
   card: {
-    maxWidth: 350,
+    maxWidth: 375,
   },
   media: {
     height: 270,
@@ -39,7 +38,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 318,
+    width: 320,
     textAlign: 'center'
   },
   pinnedUser: {
@@ -114,8 +113,8 @@ class SearchResultsCard extends React.Component {
       })
       .then(resp => resp.json())
       .then(obj => {
-        console.log(obj);
         this.props.addNewPin(obj)
+        console.log(this.props.allPins);
       })
     })
   }
@@ -173,6 +172,7 @@ class SearchResultsCard extends React.Component {
 
   handleClickCardMapZoom = (location) => {
     this.props.setMapLocation({mapLocation: [location.coordinates.latitude, location.coordinates.longitude], mapZoom: 15})
+    this.props.addSearchCard(location)
   }
 
   reviewsMap = (location, classes) => {
@@ -211,10 +211,18 @@ class SearchResultsCard extends React.Component {
     }
   }
 
+  displayItem = () => {
+    if (this.props.currentMarker) {
+      return this.props.searchResults.filter(result => result.id === this.props.currentMarker.place.yelp_id)
+    } else {
+    return this.props.searchResults
+    }
+  }
+
   searchCards = () => {
-    console.log("inside searchCards");
     const { classes } = this.props;
-      return this.props.searchResults.map(location => {
+
+      return this.displayItem().map(location => {
         const totalReviews = `${this.props.allReviews.filter(review => review.place.yelp_id === location.id).length} Review(s)`
         return (
           <GridListTile
@@ -315,8 +323,6 @@ class SearchResultsCard extends React.Component {
   }
 
   render() {
-    console.log("currentList", this.props.currentList)
-    console.log("in render currentMarker", this.props.currentMarker);;
     const { classes } = this.props;
     return (
       <div>
@@ -388,6 +394,9 @@ const mapDispatchToProps = (dispatch) => {
     setMapLocation: (payload) => {
       dispatch({type: "SET_MAP_LOCATION", payload: payload})
     },
+    addSearchCard: (payload) => {
+      dispatch({type: "ADD_SEARCH_CARD", payload: payload})
+    }
   }
 }
 

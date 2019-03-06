@@ -63,13 +63,17 @@ class NewPinForm extends React.Component {
           onClose={this.props.toggleForm}
           aria-labelledby="form-dialog-title"
         >
-          {this.props.currentMarker ?
-            <h2>{this.props.currentMarker.place.name}</h2>
-            : null}
-          {this.props.currentMarker ? <img className="locationImage" src={this.props.currentMarker.place.img_url}/> : null}
-          <br/>
+          <DialogTitle disableTypography>
+            {this.props.currentMarker ?
+              <h3>{this.props.currentMarker.place.name}</h3>
+              : null}
+            {this.props.currentMarker ? <img className="locationImage" src={this.props.currentMarker.place.img_url}/> : null}<br/><br/>
+            {this.props.currentMarker.place.address}<br/>
+            {this.props.currentMarker.place.city}, {this.props.currentMarker.place.state}<br/> {this.props.currentMarker.place.zip_code}
+          </DialogTitle>
+          <Divider style={{width: '500px'}}/>
           <DialogContent >
-            <h3>Please select the list to add the following pin to: </h3>
+            <h4>Please select the list to add the following pin to:</h4>
             <FormControl variant="filled" >
             <InputLabel htmlFor="filled-age-native-simple">List</InputLabel>
             <Select

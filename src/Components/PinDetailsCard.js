@@ -18,6 +18,9 @@ import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
+import NewPinForm from './NewPinForm'
+import NewReviewForm from './NewReviewForm'
+
 import { connect } from 'react-redux'
 
 const placesURL = 'http://localhost:3000/api/v1/places'
@@ -25,7 +28,7 @@ const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
 const styles = theme => ({
   card: {
-    maxWidth: 350,
+    maxWidth: 375,
   },
   media: {
     height: 270,
@@ -35,7 +38,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 318,
+    width: 319,
     textAlign: 'center'
   },
   pinnedUser: {
@@ -55,48 +58,12 @@ const styles = theme => ({
 
 class PinDetailsCard extends React.Component {
 
-  filterPinnedLocations = (marker) => {
-    return this.props.allPins.filter(pin => pin.place.yelp_id === marker.place.yelp_id)
+  state = {
+    pinDetails: null
   }
 
-  handlePinClick = (marker) => {
-    fetch(placesURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        yelp_id: marker.place.yelp_id,
-        name: marker.place.name,
-        address: marker.place.address,
-        latitude: marker.place.latitude,
-        longitude: marker.place.longitude,
-        img_url: marker.place.img_url,
-        yelp_url: marker.place.yelp_url,
-        yelp_rating: marker.place.yelp_rating,
-        price: marker.place.price
-      })
-    })
-    .then(resp => resp.json())
-    .then(() => {
-      fetch(pinsURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: 1,
-          list_id: this.props.currentList.id,
-          yelp_id: marker.place.yelp_id
-        })
-      })
-      .then(resp => resp.json())
-      .then(obj => {
-        this.props.addNewPin(obj)
-      })
-    })
+  filterPinnedLocations = (marker) => {
+    return this.props.allPins.filter(pin => pin.place.yelp_id === marker.place.yelp_id)
   }
 
   handleDeletePin = (marker) => {
@@ -112,8 +79,12 @@ class PinDetailsCard extends React.Component {
     })
   }
 
-  handleReviewClick = () => {
+  handleReviewClick = (pin) => {
+    console.log("in here");
     this.props.toggleReviewForm()
+    this.setState({
+      pinDetails: pin
+    }, () => console.log(this.state.pinDetails))
   }
 
   handlePinClickWithoutList = () => {
@@ -122,7 +93,6 @@ class PinDetailsCard extends React.Component {
 
   pinnedUsers = (marker, classes) => {
     const notUserPins = this.filterPinnedLocations(marker).filter(pin => pin.user.id !== this.props.currentUser)
-    console.log(notUserPins)
     if (this.filterPinnedLocations(marker).length >= 1 && notUserPins.length !== 0) {
       const pinLabel1 = `${notUserPins[0].user.username} pinned this`
       const pinLabel2 = `${notUserPins[0].user.username} and ${notUserPins.length-1} other(s) pinned this`
@@ -252,26 +222,8 @@ class PinDetailsCard extends React.Component {
                   </Button>}
                   {this.reviewsMap(this.props.currentMarker, classes)}
                 <CardActions>
-                  {this.props.currentListPins.filter(pin => pin.place.yelp_id === this.props.currentMarker.place.yelp_id).length !== 0 ?
                   <Button
-                    color="gray"
-                    variant="contained"
-                    size="small"
-                    onClick={() => this.handleDeletePin(this.props.currentMarker)}>
-                    <RemoveIcon/>
-                    Unpin
-                  </Button>
-                     :
-                  <Button
-                    variant="contained"
-                    color="primary" size="small"
-                    aria-label="Add"
-                    onClick={() => this.handlePinClick(this.props.currentMarker)}>
-                    <AddIcon/>
-                    Pin
-                  </Button>
-                  }
-                  <Button
+                    onClick={() => this.handleReviewClick(this.props.currentMarker)}
                     variant="contained"
                     color="secondary"
                     size="small"
@@ -280,11 +232,13 @@ class PinDetailsCard extends React.Component {
                     Review
                   </Button>
                   <Divider/>
+                  {this.props.openPinForm ? <NewPinForm/ > : null}
                 </CardActions>
               </CardContent>
             </CardActionArea>
           </Card>
         </GridListTile>
+        {this.props.openNewReviewForm ? <NewReviewForm pin={this.state.pinDetails}/> : null}
       </div>
     );
   }
@@ -303,7 +257,9 @@ const mapStateToProps = (state) => {
     currentList: state.currentList,
     allPins: state.allPins,
     allReviews: state.allReviews,
-    currentListPins: state.currentListPins
+    currentListPins: state.currentListPins,
+    openPinForm: state.openNewPinForm,
+    openNewReviewForm: state.openNewReviewForm
   }
 }
 

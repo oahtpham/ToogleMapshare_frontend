@@ -19,7 +19,7 @@ const styles = {
     padding: '2px 4px',
     display: 'flex',
     alignItems: 'center',
-    width: 350,
+    width: 375,
   },
   input: {
     marginLeft: 8,
@@ -60,11 +60,13 @@ class Search extends React.Component {
     .then(response => response.json())
     .then(obj => {
       this.props.setResults(obj)
+      this.props.addSearchCard(null)
     })
   }
 
   handleKeyDown =  (event) => {
     if (event.key === "Enter") {
+      this.props.setMarker(null)
       this.fetchResults()
     }
   }
@@ -92,7 +94,7 @@ class Search extends React.Component {
           <SearchIcon />
         </IconButton>
         </Paper>
-        {this.props.searchResults.length === 0 || this.props.searchTerm === "" ? null : <PinsContainer/>}
+        {this.props.searchResults.length === 0 || this.props.searchTerm  === "" ? null : <PinsContainer/>}
       </div>
     );
   }
@@ -106,7 +108,9 @@ function mapStateToProps(state) {
   return {
     currentList: state.currentList,
     searchResults: state.searchResults,
-    searchTerm: state.searchTerm
+    searchTerm: state.searchTerm,
+    mapLocation: state.mapLocation,
+    currentMarker: state.currentMarker
   }
 }
 
@@ -121,6 +125,12 @@ function mapDispatchToProps(dispatch) {
     setMapLocation: (payload) => {
       dispatch({type: "SET_MAP_LOCATION", payload: payload})
     },
+    setMarker: (payload) => {
+      dispatch({type:"CURRENT_MARKER", payload: payload})
+    },
+    addSearchCard: (payload) => {
+      dispatch({type: "ADD_SEARCH_CARD", payload: payload})
+    }
   }
 }
 

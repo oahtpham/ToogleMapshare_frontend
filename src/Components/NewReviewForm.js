@@ -33,7 +33,7 @@ class NewReviewForm extends React.Component {
     });
   }
 
-  handleSubmit = (searchPin) => {
+  handleSearchSubmit = (searchPin) => {
     fetch(placesURL, {
       method: "POST",
       headers: {
@@ -78,6 +78,51 @@ class NewReviewForm extends React.Component {
     })
   }
 
+  handleSubmit = (pin) => {
+    fetch(reviewsURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: 1,
+        yelp_id: pin.place.yelp_id,
+        notes: this.state.note,
+        rating: this.state.rating
+      })
+    })
+    .then(resp => resp.json())
+    .then(obj => {
+      this.props.toggleForm()
+      this.props.addNewReview(obj);
+    })
+  }
+
+  locationDetails = () => {
+    if (this.props.currentList) {
+      return (
+        <div>
+          <h4>{this.props.searchPin.name}</h4>
+          <img className="locationImage" src={this.props.searchPin.image_url}/><br/><br/>
+          {this.props.searchPin.location.address1}<br/>
+          {this.props.searchPin.location.city}, {this.props.searchPin.location.state}<br/> {this.props.searchPin.location.zip_code}
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <h4>{this.props.pin.place.name}</h4>
+          <img className="locationImage" src={this.props.pin.place.img_url}/><br/><br/>
+          {this.props.pin.place.address}<br/>
+          {this.props.pin.place.city}, {this.props.pin.place.state}<br/> {this.props.pin.place.zip_code}
+        </div>
+      )
+    }
+  }
+
+
+
   render() {
     return (
       <div>
@@ -86,10 +131,7 @@ class NewReviewForm extends React.Component {
           onClose={this.props.toggleForm}
         >
           <DialogTitle disableTypography>
-            <h4>{this.props.searchPin.name}</h4>
-            <img className="locationImage" src={this.props.searchPin.image_url}/><br/><br/>
-            {this.props.searchPin.location.address1}<br/>
-            {this.props.searchPin.location.city}, {this.props.searchPin.location.state}<br/> {this.props.searchPin.location.zip_code}
+          {this.locationDetails()}
           </DialogTitle>
           <Divider style={{width: '500px'}}/>
           <DialogContent onChange={this.handleOnChange}>
@@ -120,7 +162,9 @@ class NewReviewForm extends React.Component {
             <Button onClick={this.props.toggleForm} color="primary">
               Close
             </Button>
-            <Button onClick={() => this.handleSubmit(this.props.searchPin)} color="primary">
+            <Button
+            onClick={this.props.currentList ? () => this.handleSearchSubmit(this.props.searchPin) : () => this.handleSubmit(this.props.pin) }
+            color="primary">
               Add Review
             </Button>
           </DialogActions>
@@ -135,7 +179,8 @@ class NewReviewForm extends React.Component {
 const mapStateToProps = (state) => {
   return {
     open: state.openNewReviewForm,
-    currentMarker: state.currentMarker
+    currentMarker: state.currentMarker,
+    currentList: state.currentList
   }
 }
 
