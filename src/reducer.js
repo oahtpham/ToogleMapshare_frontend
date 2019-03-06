@@ -15,7 +15,8 @@ const defaultState = {
   allLists: [],
   allPins: [],
   allReviews: [],
-  showPins: [],
+  userPins: [],
+  friendsPins: [],
   mapZoom: 5,
 }
 
@@ -37,7 +38,7 @@ export default function reducer(state = defaultState, action) {
     case "ADD_NEW_LIST" :
       return {...state, allLists: [...state.allLists, action.payload]}
     case "ADD_NEW_PIN" :
-      return {...state, currentListPins: [...state.currentListPins, action.payload], allPins: [...state.allPins, action.payload], showPins: [...state.showPins, action.payload]}
+      return {...state, currentListPins: [...state.currentListPins, action.payload], allPins: [...state.allPins, action.payload], userPins: [...state.userPins, action.payload]}
     case "ADD_NEW_REVIEW" :
       return {...state, allReviews: [...state.allReviews, action.payload]}
     case "ADD_SEARCH_CARD" :
@@ -46,10 +47,12 @@ export default function reducer(state = defaultState, action) {
 
     case "SET_ALL_PINS" :
       return {...state, allPins: action.payload}
+    case "SET_FRIENDS_PINS" :
+      return {...state, friendsPins: action.payload}
+    case "SET_USER_PINS" :
+      return {...state, userPins: action.payload}
     case "SET_ALL_REVIEWS" :
       return {...state, allReviews: action.payload}
-    case "SET_SHOW_PINS" :
-      return {...state, showPins: action.payload}
     case "SET_MAP_LOCATION" :
       return {...state, mapLocation: action.payload.mapLocation, mapZoom: action.payload.mapZoom}
     case "SET_SEARCH_TERM" :

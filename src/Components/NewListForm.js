@@ -56,7 +56,7 @@ class NewListForm extends React.Component {
         this.props.listDetails(obj)
         this.props.addNewList(obj)
         this.props.toggleForm()
-        this.props.setMapLocation({mapLocation: [obj.latitude, obj.longitude], mapZoom: 13})
+        this.props.setMapLocation({mapLocation: [obj.latitude, obj.longitude], mapZoom: 12})
       })
     })
   }

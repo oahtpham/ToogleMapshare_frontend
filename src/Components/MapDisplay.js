@@ -44,7 +44,10 @@ class MapDisplay extends React.Component {
     .then(resp => resp.json())
     .then(obj => {
       this.props.setAllPins(obj)
-      this.props.setShowPins(obj)
+      const friendsPins = obj.filter(pin => pin.user.id !== this.props.currentUser)
+      const userPins = obj.filter(pin => pin.user.id === this.props.currentUser)
+      this.props.setFriendsPins(friendsPins)
+      this.props.setUserPins(userPins)
     })
     .then(() => {
       fetch(reviewsURL)
@@ -97,8 +100,8 @@ class MapDisplay extends React.Component {
     this.props.setResults([])
   }
 
-  renderAllPinnedLocations = () => {
-      return this.props.showPins.map(pin => {
+  renderFriendsPinnedLocations = () => {
+      return this.props.friendsPins.map(pin => {
         const position = [pin.place.latitude, pin.place.longitude]
         return (
           <div>
@@ -108,7 +111,41 @@ class MapDisplay extends React.Component {
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               position={position}
-              icon={pin.user.id === this.props.currentUser ? greenIcon : redIcon }>
+              icon={redIcon}>
+              <Popup>
+                {pin.place.img_url ? <img className="locationImage" src={ pin.place.img_url}/> : null}
+                <br/>
+                <h3>{pin.place.name}</h3>
+                <p>{pin.place.address}<br/>
+                {pin.place.city}, {pin.place.state} {pin.place.zip_code}</p>
+                <StarRatings
+                 rating={pin.place.yelp_rating}
+                 starRatedColor="orange"
+                 numberOfStars={5}
+                 starDimension="12px"
+                 starSpacing="1px"
+                 name='rating'
+               />
+              <br/>
+              </Popup>
+            </Marker>
+          </div>
+        )
+      })
+  }
+
+  renderUserPinnedLocations = () => {
+      return this.props.userPins.map(pin => {
+        const position = [pin.place.latitude, pin.place.longitude]
+        return (
+          <div>
+            <Marker
+              key={pin.id}
+              onClick={() => this.showCurrentMarker(pin)}
+              onMouseOver={(e) => e.target.openPopup()}
+              onMouseOut={(e) => e.target.closePopup()}
+              position={position}
+              icon={greenIcon }>
               <Popup>
                 {pin.place.img_url ? <img className="locationImage" src={ pin.place.img_url}/> : null}
                 <br/>
@@ -230,9 +267,9 @@ class MapDisplay extends React.Component {
                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
                url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
              />
-             {this.renderAllPinnedLocations()}
+             {this.renderFriendsPinnedLocations()}
+             {this.props.currentList ? this.showCurrentListPins() : this.renderUserPinnedLocations()}
              {this.props.searchTerm === "" ? null : this.renderSearchPins()}
-             {this.showCurrentListPins()}
              <ZoomControl position="topright"/>
            </Map>
          </div>
@@ -253,8 +290,9 @@ function mapStateToProps(state) {
     mapLocation: state.mapLocation,
     mapZoom: state.mapZoom,
     allPins: state.allPins,
+    friendsPins: state.friendsPins,
+    userPins: state.userPins,
     allReviews: state.allReviews,
-    showPins: state.showPins,
     markerDetailsDisplay: state.markerDetailsDisplay,
     searchCard: state.searchCard
   }
@@ -267,9 +305,6 @@ function mapDispatchToProps(dispatch) {
     },
     setAllPins: (payload) => {
       dispatch({type:"SET_ALL_PINS", payload: payload})
-    },
-    setShowPins: (payload) => {
-      dispatch({type:"SET_SHOW_PINS", payload: payload})
     },
     setAllReviews: (payload) => {
       dispatch({type:"SET_ALL_REVIEWS", payload: payload})
@@ -285,6 +320,12 @@ function mapDispatchToProps(dispatch) {
     },
     setSearchTerm: (payload) => {
       dispatch({type: 'SET_SEARCH_TERM', payload: payload})
+    },
+    setFriendsPins: (payload) => {
+      dispatch({type: 'SET_FRIENDS_PINS', payload: payload})
+    },
+    setUserPins: (payload) => {
+      dispatch({type: 'SET_USER_PINS', payload: payload})
     },
   }
 }

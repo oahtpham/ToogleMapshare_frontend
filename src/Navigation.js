@@ -185,10 +185,10 @@ class Navigation extends React.Component {
     this.setState({
       toggleSwitch: !this.state.toggleSwitch
     })
-    if (!this.state.toggleSwitch) {
-      this.props.setShowPins(this.props.allPins)
+    if (!this.state.toggleSwitch) {;
+      this.props.setFriendsPins(this.props.allPins.filter(pin => pin.user.id !== this.props.currentUser))
     } else {
-      this.props.setShowPins([])
+      this.props.setFriendsPins([])
     }
   }
 
@@ -220,7 +220,7 @@ class Navigation extends React.Component {
     this.props.setCurrentListPins(pinDetails)
     this.handleDrawerClose()
     this.props.setSearchTerm("")
-    this.props.setMapLocation({mapLocation: [list.latitude, list.longitude], mapZoom: 13})
+    this.props.setMapLocation({mapLocation: [list.latitude, list.longitude], mapZoom: 12})
   }
 
   handleSearchInput = (event) => {
@@ -231,7 +231,6 @@ class Navigation extends React.Component {
 
   handleSearch = (e) => {
     if (e.key === "Enter") {
-      // this.setState(STATERESET)
       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${this.state.searchLocation}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
       .then(response => response.json())
       .then(geolocation => {
@@ -241,7 +240,7 @@ class Navigation extends React.Component {
         })
       })
       .then(() => {
-        this.props.setMapLocation({mapLocation:[this.state.latitude, this.state.longitude], mapZoom: 13 })
+        this.props.setMapLocation({mapLocation:[this.state.latitude, this.state.longitude], mapZoom: 12 })
       })
     }
   }
@@ -278,7 +277,7 @@ class Navigation extends React.Component {
               variant="h6"
               color="inherit"
               noWrap>
-              {this.props.currentList ? this.props.currentList.title : 'shareIt'}
+              {this.props.currentList ? this.props.currentList.title : 'MapShare'}
             </Typography>
             <Tooltip title={this.state.toggleSwitch ? "Hide Friends' Pins" : "Show Friends' Pins"}>
               <Switch
@@ -395,7 +394,9 @@ function mapStateToProps (state) {
     allLists: state.allLists,
     currentUser: state.currentUser,
     allPins: state.allPins,
-    currentListPins: state.currentListPins
+    currentListPins: state.currentListPins,
+    friendsPins: state.friendsPins,
+    userPins: state.userPins
   }
 }
 
@@ -413,8 +414,11 @@ function mapDispatchToProps (dispatch) {
     setAllLists: (payload) => {
       dispatch({type:"SET_ALL_LISTS", payload: payload})
     },
-    setShowPins: (payload) => {
-      dispatch({type:"SET_SHOW_PINS", payload: payload})
+    setFriendsPins: (payload) => {
+      dispatch({type: 'SET_FRIENDS_PINS', payload: payload})
+    },
+    setUserPins: (payload) => {
+      dispatch({type: 'SET_USER_PINS', payload: payload})
     },
     setCurrentListPins: (payload) => {
       dispatch({type: "CURRENT_LIST_PINS", payload: payload})

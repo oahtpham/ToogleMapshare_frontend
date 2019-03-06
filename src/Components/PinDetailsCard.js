@@ -38,7 +38,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 319,
+    width: 342,
     textAlign: 'center'
   },
   pinnedUser: {
@@ -168,7 +168,9 @@ class PinDetailsCard extends React.Component {
             Restaurant Details
           </ListSubheader>
         </GridListTile>
-        <GridListTile key={this.props.currentMarker.place.id} cols={3} >
+        <GridListTile
+          key={this.props.currentMarker.place.id}
+          cols={3} >
           <Card className={classes.card} >
             <CardActionArea>
               <CardMedia
@@ -216,12 +218,19 @@ class PinDetailsCard extends React.Component {
                     variant="outlined"
                     color="secondary"
                     size="large"
-                    disabled
                     className={classes.button}>
                     All Reviews
                   </Button>}
                   {this.reviewsMap(this.props.currentMarker, classes)}
                 <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary" size="small"
+                    aria-label="Add"
+                    onClick={() => this.handlePinClickWithoutList(this.props.currentMarker)}>
+                    <AddIcon/>
+                    Pin
+                  </Button>
                   <Button
                     onClick={() => this.handleReviewClick(this.props.currentMarker)}
                     variant="contained"

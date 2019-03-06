@@ -68,11 +68,14 @@ class Search extends React.Component {
     if (event.key === "Enter") {
       this.props.setMarker(null)
       this.fetchResults()
+      this.props.setMapLocation({mapLocation: [this.props.currentList.latitude, this.props.currentList.longitude], mapZoom: 12})
     }
   }
 
   handleClick = () => {
+    this.props.setMarker(null)
     this.fetchResults()
+    this.props.setMapLocation({mapLocation: [this.props.currentList.latitude, this.props.currentList.longitude], mapZoom: 12})
   }
 
   render() {

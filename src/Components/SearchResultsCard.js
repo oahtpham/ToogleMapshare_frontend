@@ -38,7 +38,7 @@ const styles = theme => ({
     height: 30
   },
   button: {
-    width: 320,
+    width: 342,
     textAlign: 'center'
   },
   pinnedUser: {

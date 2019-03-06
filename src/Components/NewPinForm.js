@@ -29,8 +29,9 @@ class NewPinForm extends React.Component {
     })
   }
 
-  mapLists = () => {
-    return this.props.allLists.map(list => {
+  mapLists = (pin) => {
+    const listFilter = this.props.allLists.filter(list => list.id !== pin.list.id)
+    return listFilter.map(list => {
       return <option value={list.id}>{list.title}</option>
     })
   }
@@ -73,7 +74,8 @@ class NewPinForm extends React.Component {
           </DialogTitle>
           <Divider style={{width: '500px'}}/>
           <DialogContent >
-            <h4>Please select the list to add the following pin to:</h4>
+            {this.props.currentMarker.user.id === this.props.currentUser ?
+              <h4>This place is currently pinned to your {this.props.currentMarker.list.title} list. <br/><br/> Use the drop down below to add a pin to a different list or create a new list. </h4> : <h4>Please select the list to add the following pin to:</h4> }
             <FormControl variant="filled" >
             <InputLabel htmlFor="filled-age-native-simple">List</InputLabel>
             <Select
@@ -83,7 +85,7 @@ class NewPinForm extends React.Component {
               input={<FilledInput name="age" id="filled-age-native-simple" />}
             >
               <option value="" />
-            {this.mapLists()}
+            {this.mapLists(this.props.currentMarker)}
             </Select>
           </FormControl>
           </DialogContent>
@@ -110,7 +112,8 @@ const mapStateToProps = (state) => {
   return {
     open: state.openNewPinForm,
     currentMarker: state.currentMarker,
-    allLists: state.allLists
+    allLists: state.allLists,
+    currentUser: state.currentUser
   }
 }
 
