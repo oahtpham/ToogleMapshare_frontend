@@ -1,4 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import NewListForm from '../Components/NewListForm'
+
+//material UI style imports
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -26,23 +30,13 @@ import ListIcon from '@material-ui/icons/List'
 import AddBoxIcon from '@material-ui/icons/AddBox'
 import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
-
-
-
-import { connect } from 'react-redux'
-
-
-//nested_list
 import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 
-import NewListForm from './Components/NewListForm'
-
-
+// backend API links
 const listsURL = 'http://localhost:3000/api/v1/lists'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
@@ -163,6 +157,8 @@ const styles = theme => ({
 });
 
 class Navigation extends React.Component {
+
+  /// LOCAL STATE - NO NEED FOR OTHER COMPONENTS TO ACCESS ///
   state = {
     open: false,
     latitude: null,
@@ -172,6 +168,7 @@ class Navigation extends React.Component {
     toggleSwitch: true,
   };
 
+  //used to display all current users' lists //
   componentDidMount() {
     fetch(listsURL)
     .then(resp => resp.json())
@@ -181,6 +178,7 @@ class Navigation extends React.Component {
     })
   }
 
+  // toggle used to display/hide friends' pins //
   handleSwitch = () => {
     this.setState({
       toggleSwitch: !this.state.toggleSwitch
@@ -192,6 +190,7 @@ class Navigation extends React.Component {
     }
   }
 
+  // used to display/hide menu
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };
@@ -223,6 +222,8 @@ class Navigation extends React.Component {
     this.props.setMapLocation({mapLocation: [list.latitude, list.longitude], mapZoom: 12})
   }
 
+
+  // search bar located on the nav bar on homepage.. used to focus in on locations without having to manually zoom in or create a list //
   handleSearchInput = (event) => {
     this.setState({
       searchLocation: event.target.value
@@ -245,6 +246,8 @@ class Navigation extends React.Component {
     }
   }
 
+
+  // takes you back to homepage //
   homeClick = () => {
     this.props.clearList()
     this.props.setResults([])
@@ -277,7 +280,7 @@ class Navigation extends React.Component {
               variant="h6"
               color="inherit"
               noWrap>
-              {this.props.currentList ? this.props.currentList.title : 'MapShare'}
+              {this.props.currentList ? this.props.currentList.title : 'Toogle MapShare'}
             </Typography>
             <Tooltip title={this.state.toggleSwitch ? "Hide Friends' Pins" : "Show Friends' Pins"}>
               <Switch
@@ -388,6 +391,7 @@ Navigation.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
+//redux states and functions //
 function mapStateToProps (state) {
   return {
     currentList: state.currentList,

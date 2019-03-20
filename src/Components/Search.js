@@ -1,4 +1,8 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import PinDetailsContainer from '../Containers/PinDetailsContainer'
+
+//Material UI style imports
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -8,9 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import DirectionsIcon from '@material-ui/icons/Directions';
-import PinsContainer from '../Containers/PinsContainer'
 
-import { connect } from 'react-redux'
 
 const searchUrl = 'http://localhost:3000/api/v1/yelp'
 
@@ -45,6 +47,7 @@ class Search extends React.Component {
     }
   }
 
+  //hits Yelp API for search results
   fetchResults = () => {
     fetch(searchUrl, {
       method: "POST",
@@ -97,7 +100,7 @@ class Search extends React.Component {
           <SearchIcon />
         </IconButton>
         </Paper>
-        {this.props.searchResults.length === 0 || this.props.searchTerm  === "" ? null : <PinsContainer/>}
+        {this.props.searchResults.length === 0 || this.props.searchTerm  === "" ? null : <PinDetailsContainer/>}
       </div>
     );
   }

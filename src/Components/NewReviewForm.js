@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux'
+
+//material UI style imports
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -6,24 +9,24 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { connect } from 'react-redux'
-import { Redirect, Link } from "react-router-dom"
 import Divider from '@material-ui/core/Divider'
 import StarRatings from 'react-star-ratings'
 
+//backend API links
 const placesURL = 'http://localhost:3000/api/v1/places'
 const reviewsURL = 'http://localhost:3000/api/v1/reviews'
 
 class NewReviewForm extends React.Component {
 
+  // local state needed to handle form inputs
   state = {
     note: '',
     rating: 0
   }
 
-  handleOnChange = (event) => {
+  handleOnChange = (e) => {
     this.setState({
-      note: event.target.value
+      note: e.target.value
     })
   }
 
@@ -33,6 +36,9 @@ class NewReviewForm extends React.Component {
     });
   }
 
+  //reviews a place from search results
+  //initial fetch persists restaurant details to backend
+  //second fetch persists the new review details to backend
   handleSearchSubmit = (searchPin) => {
     fetch(placesURL, {
       method: "POST",
@@ -72,12 +78,13 @@ class NewReviewForm extends React.Component {
       })
       .then(resp => resp.json())
       .then(obj => {
-        this.props.toggleForm()
+        this.props.toggleReviewForm()
         this.props.addNewReview(obj);
       })
     })
   }
 
+  //reviews a place that is already pinned
   handleSubmit = (pin) => {
     fetch(reviewsURL, {
       method: "POST",
@@ -94,7 +101,7 @@ class NewReviewForm extends React.Component {
     })
     .then(resp => resp.json())
     .then(obj => {
-      this.props.toggleForm()
+      this.props.toggleReviewForm()
       this.props.addNewReview(obj);
     })
   }
@@ -122,13 +129,12 @@ class NewReviewForm extends React.Component {
   }
 
 
-
   render() {
     return (
       <div>
         <Dialog
           open={this.props.open}
-          onClose={this.props.toggleForm}
+          onClose={this.props.toggleReviewForm}
         >
           <DialogTitle disableTypography>
           {this.locationDetails()}
@@ -159,11 +165,11 @@ class NewReviewForm extends React.Component {
           <DialogActions>
             <br/>
             <br/>
-            <Button onClick={this.props.toggleForm} color="primary">
+            <Button onClick={this.props.toggleReviewForm} color="primary">
               Close
             </Button>
             <Button
-            onClick={this.props.currentList ? () => this.handleSearchSubmit(this.props.searchPin) : () => this.handleSubmit(this.props.pin) }
+            onClick={this.props.currentList ? () => this.handleSearchSubmit(this.props.searchPin) : () => this.handleSubmit(this.props.pin) } //pin props come from parent component and not stored in reducer
             color="primary">
               Add Review
             </Button>
@@ -179,14 +185,13 @@ class NewReviewForm extends React.Component {
 const mapStateToProps = (state) => {
   return {
     open: state.openNewReviewForm,
-    currentMarker: state.currentMarker,
     currentList: state.currentList
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleForm: () => {
+    toggleReviewForm: () => {
       dispatch({type: "OPEN_NEW_REVIEW_FORM"})
     },
     addNewReview: (payload) => {

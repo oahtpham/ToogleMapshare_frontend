@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect } from 'react-redux'
+
+//material UI style imports
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -6,11 +9,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { connect } from 'react-redux'
-import { Redirect, Link } from "react-router-dom"
 
 class NewListForm extends React.Component {
 
+  // local state needed to handle form inputs
   state = {
     title: '',
     location: '',
@@ -19,15 +21,16 @@ class NewListForm extends React.Component {
     redirect: false
   }
 
-  handleOnChange = (event) => {
+  handleOnChange = (e) => {
     this.setState({
-      [event.target.name]: event.target.value
+      [e.target.name]: e.target.value
     })
   }
 
+  //initial fetch accesses Google Maps API to find lat and long of text location input
+  //second fetch will then create a new list and persist to database
   handleSubmit = (e) => {
     e.preventDefault()
-    // this.setState(STATERESET)
     fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${this.state.location}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
     .then(response => response.json())
     .then(geolocation =>
@@ -53,10 +56,10 @@ class NewListForm extends React.Component {
       })
       .then(response => response.json())
       .then(obj => {
-        this.props.listDetails(obj)
-        this.props.addNewList(obj)
-        this.props.toggleForm()
-        this.props.setMapLocation({mapLocation: [obj.latitude, obj.longitude], mapZoom: 12})
+        this.props.currentList(obj) //sets map to currentList
+        this.props.addNewList(obj) //adds to dropdown lists in menu bar
+        this.props.toggleListForm() //closes list dialog box
+        this.props.setMapLocation({mapLocation: [obj.latitude, obj.longitude], mapZoom: 12}) //zooms map into location
       })
     })
   }
@@ -67,7 +70,7 @@ class NewListForm extends React.Component {
       <div>
         <Dialog
           open={this.props.open}
-          onClose={this.props.toggleForm}
+          onClose={this.props.toggleListForm}
           aria-labelledby="form-dialog-title"
         >
           <DialogTitle id="form-dialog-title">Start a New List</DialogTitle>
@@ -91,7 +94,7 @@ class NewListForm extends React.Component {
           </DialogContent>
           <DialogActions>
             <Button
-              onClick={this.props.toggleForm}
+              onClick={this.props.toggleListForm}
               color="primary">
               Close
             </Button>
@@ -109,17 +112,16 @@ class NewListForm extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    open: state.openNewListForm,
-    details: state.currentList
+    open: state.openNewListForm
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleForm: () => {
+    toggleListForm: () => {
       dispatch({type: "OPEN_NEW_LIST_FORM"})
     },
-    listDetails: (payload) => {
+    currentList: (payload) => {
       dispatch({type: "CURRENT_LIST", payload: payload})
     },
     addNewList: (payload) => {

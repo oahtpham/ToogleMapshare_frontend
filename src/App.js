@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import Navigation from './Navigation'
+import Navigation from './Containers/Navigation'
 import Search from './Components/Search'
-import MapDisplay from './Components/MapDisplay'
-import BottomNavigation from './BottomNavigation'
-import AlertBox from './AlertBox'
+import MapDisplay from './Containers/MapDisplay'
+import WelcomeAlertBox from './WelcomeAlertBox'
 import './App.css'
 import { connect } from 'react-redux'
 
@@ -13,7 +12,7 @@ class App extends Component {
     return (
       <div className="App">
         <Navigation/>
-        {this.props.currentList ? <Search/> : <AlertBox/>}
+        {this.props.currentList ? <Search/> : <WelcomeAlertBox/>}
         <MapDisplay/>
       </div>
     );

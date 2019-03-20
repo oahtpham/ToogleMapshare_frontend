@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-class AlertBox extends React.Component {
+class WelcomeAlertBox extends React.Component {
   state = {
     open: true,
   };
@@ -31,7 +31,10 @@ class AlertBox extends React.Component {
           <DialogTitle id="alert-dialog-title">{"Welcome!"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              All pins on the map are pinned locations set by our users. Add pins to any of your current lists or create a new list to get started!
+              All pins on the map are pinned locations set by you (green) or your friends (pink).
+              <br/>
+              <br/>
+              Click on pins for location details or head to the Menu on the top left to create a new list or to access any of your current lists.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -45,4 +48,4 @@ class AlertBox extends React.Component {
   }
 }
 
-export default AlertBox;
+export default WelcomeAlertBox;

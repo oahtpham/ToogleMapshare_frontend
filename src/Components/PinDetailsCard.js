@@ -1,4 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import NewReviewForm from './NewReviewForm'
+
+//material UI style imports
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -18,11 +22,7 @@ import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
-import NewPinForm from './NewPinForm'
-import NewReviewForm from './NewReviewForm'
-
-import { connect } from 'react-redux'
-
+//backend API links
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
 
@@ -80,15 +80,10 @@ class PinDetailsCard extends React.Component {
   }
 
   handleReviewClick = (pin) => {
-    console.log("in here");
     this.props.toggleReviewForm()
     this.setState({
       pinDetails: pin
-    }, () => console.log(this.state.pinDetails))
-  }
-
-  handlePinClickWithoutList = () => {
-    this.props.togglePinForm()
+    })
   }
 
   pinnedUsers = (marker, classes) => {
@@ -224,14 +219,6 @@ class PinDetailsCard extends React.Component {
                   {this.reviewsMap(this.props.currentMarker, classes)}
                 <CardActions>
                   <Button
-                    variant="contained"
-                    color="primary" size="small"
-                    aria-label="Add"
-                    onClick={() => this.handlePinClickWithoutList(this.props.currentMarker)}>
-                    <AddIcon/>
-                    Pin
-                  </Button>
-                  <Button
                     onClick={() => this.handleReviewClick(this.props.currentMarker)}
                     variant="contained"
                     color="secondary"
@@ -241,7 +228,6 @@ class PinDetailsCard extends React.Component {
                     Review
                   </Button>
                   <Divider/>
-                  {this.props.openPinForm ? <NewPinForm/ > : null}
                 </CardActions>
               </CardContent>
             </CardActionArea>
@@ -267,7 +253,6 @@ const mapStateToProps = (state) => {
     allPins: state.allPins,
     allReviews: state.allReviews,
     currentListPins: state.currentListPins,
-    openPinForm: state.openNewPinForm,
     openNewReviewForm: state.openNewReviewForm
   }
 }
@@ -276,9 +261,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     toggleReviewForm: () => {
       dispatch({type:"OPEN_NEW_REVIEW_FORM"})
-    },
-    togglePinForm: () => {
-      dispatch({type: "OPEN_NEW_PIN_FORM"})
     },
     addNewPin: (payload) => {
       dispatch({type: "ADD_NEW_PIN", payload: payload})

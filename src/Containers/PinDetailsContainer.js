@@ -1,4 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import SearchResultsCard from '../Components/SearchResultsCard'
+import PinDetailsCard from '../Components/PinDetailsCard'
+
+//material UI style imports
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -8,12 +13,9 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '@material-ui/core/Icon';
 import InfoIcon from '@material-ui/icons/Info';
-import SearchResultsCard from '../Components/SearchResultsCard'
-import PinDetailsCard from '../Components/PinDetailsCard'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
-import { connect } from 'react-redux'
 
 const styles = theme => ({
   root: {
@@ -45,7 +47,7 @@ const styles = theme => ({
   },
 });
 
-class PinsContainer extends React.Component{
+class PinDetailsContainer extends React.Component{
 
   render() {
     const { classes } = this.props;
@@ -69,7 +71,7 @@ class PinsContainer extends React.Component{
     }
 }
 
-PinsContainer.propTypes = {
+PinDetailsContainer.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
@@ -80,4 +82,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default withStyles(styles)(connect(mapStateToProps)(PinsContainer));
+export default withStyles(styles)(connect(mapStateToProps)(PinDetailsContainer));

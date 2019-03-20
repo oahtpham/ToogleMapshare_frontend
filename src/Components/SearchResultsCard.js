@@ -1,4 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import NewReviewForm from './NewReviewForm'
+
+// material UI style imports
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -18,13 +22,10 @@ import StarRatings from 'react-star-ratings'
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
-import NewReviewForm from './NewReviewForm'
-
-import { connect } from 'react-redux'
-
 const yelpLogo = 'https://www.logolynx.com/images/logolynx/87/8724b62c2a14845bafd396ce6620d534.png'
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
+const listsURL = 'http://localhost:3000/api/v1/lists'
 
 const styles = theme => ({
   card: {
@@ -53,7 +54,6 @@ const styles = theme => ({
     textAlign: 'center'
   }
 });
-
 
 
 class SearchResultsCard extends React.Component {
@@ -114,7 +114,12 @@ class SearchResultsCard extends React.Component {
       .then(resp => resp.json())
       .then(obj => {
         this.props.addNewPin(obj)
-        console.log(this.props.allPins);
+        fetch(listsURL)
+        .then(resp => resp.json())
+        .then(lists => {
+          const userLists = lists.filter(list => list.user.id === this.props.currentUser)
+          this.props.setAllLists(userLists)
+        })
       })
     })
   }
@@ -139,9 +144,6 @@ class SearchResultsCard extends React.Component {
     })
   }
 
-  handlePinClickWithoutList = () => {
-    this.props.togglePinForm()
-  }
 
   pinnedUsers = (location, classes) => {
     const notUserPins = this.filterPinnedLocations(location).filter(pin => pin.user.id !== this.props.currentList.user.id)
@@ -221,7 +223,6 @@ class SearchResultsCard extends React.Component {
 
   searchCards = () => {
     const { classes } = this.props;
-
       return this.displayItem().map(location => {
         const totalReviews = `${this.props.allReviews.filter(review => review.place.yelp_id === location.id).length} Review(s)`
         return (
@@ -352,7 +353,7 @@ class SearchResultsCard extends React.Component {
     );
   }
 
-} //end of PopUpCard Component
+} //end of searchResultsCard Component
 
 SearchResultsCard.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -361,13 +362,13 @@ SearchResultsCard.propTypes = {
 const mapStateToProps = (state) => {
   return {
     currentMarker: state.currentMarker,
+    currentUser: state.currentUser,
     searchResults: state.searchResults,
     currentList: state.currentList,
     allPins: state.allPins,
     allReviews: state.allReviews,
     currentListPins: state.currentListPins,
     openNewReviewForm: state.openNewReviewForm,
-    markerDetailsDisplay: state.markerDetailsDisplay
   }
 }
 
@@ -388,6 +389,9 @@ const mapDispatchToProps = (dispatch) => {
     setAllPins: (payload) => {
       dispatch({type:"SET_ALL_PINS", payload: payload})
     },
+    setAllLists: (payload) => {
+      dispatch({type:"SET_ALL_LISTS", payload: payload})
+    },
     setMarker: (payload) => {
       dispatch({type:"CURRENT_MARKER", payload: payload})
     },
@@ -396,6 +400,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     addSearchCard: (payload) => {
       dispatch({type: "ADD_SEARCH_CARD", payload: payload})
+    },
+    setCurrentList: (payload) => {
+      dispatch({type:"CURRENT_LIST", payload: payload})
     }
   }
 }

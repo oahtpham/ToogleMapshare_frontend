@@ -1,15 +1,18 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import PinDetailsContainer from './PinDetailsContainer'
 
+//leaflet API
 import { Map, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet'
 import L from 'leaflet';
+
+//material UI style imports
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Icon from '@material-ui/core/Icon';
+
 import StarRatings from 'react-star-ratings'
 
-import PinsContainer from '../Containers/PinsContainer'
-
-import { connect } from 'react-redux'
 
 const placesURL = 'http://localhost:3000/api/v1/places'
 const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
@@ -20,15 +23,11 @@ const redIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
   iconSize: [18, 30],
 });
-let blueIcon = new L.icon({
+const blueIcon = new L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon-2x.png',
   iconSize: [18, 30], // size of the icon
 });
-let greenIcon = new L.Icon({
-  iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-  iconSize: [18, 30],
-});
-let yellowIcon = new L.Icon({
+const greenIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
   iconSize: [18, 30],
 });
@@ -38,6 +37,9 @@ class MapDisplay extends React.Component {
   state = {
     showAllPins: true,
   }
+
+  // Page initializes with full pins and reviews info //
+  // Data is stored in reducer //
 
   componentDidMount() {
     fetch(pinsURL)
@@ -58,14 +60,9 @@ class MapDisplay extends React.Component {
     })
   }
 
-  handleOnChange = (event) => {
-    this.props.setSearchTerm(event.target.value)
-    if (this.props.searchTerm === "") {
-      this.props.setResults([])
-    }
-  }
 
-  fetchResults = () => {
+
+  fetchSearchResults = () => {
     fetch(searchUrl, {
       method: "POST",
       headers: {
@@ -83,22 +80,41 @@ class MapDisplay extends React.Component {
     })
   }
 
-  showCurrentMarker = (location) => {
-    if (this.props.currentList) {
+  // displays pin information onClick //
+
+  showCurrentMarkerInfo = (location) => {
+    if (this.props.currentList) { // info pulled from Yelp API
+      console.log(location);
       this.props.setSearchTerm(location.place.name)
-      this.fetchResults()
+      this.fetchSearchResults()
       this.props.setMarker(location)
-    } else {
+    } else { //info pulled from data persisted in DB
     this.props.showMarkerDisplay()
     this.props.setMarker(location)
     }
   }
 
-  hideCurrentMarker = () => {
+  hideCurrentMarkerInfo = () => {
     this.props.hideMarkerDisplay()
     this.props.setMarker(null)
     this.props.setResults([])
   }
+
+  //displays cards for top 15 search results from Yelp
+  displaySearchResults = () => {
+    if (this.props.currentMarker) {
+    // pins from homepage displayed here.. uses info persisted in DB //
+      return this.props.searchResults.filter(result => result.id === this.props.currentMarker.place.yelp_id)
+    } else if (this.props.searchCard){
+    // pin info comes from Yelp API search instead of info from DB //
+      return this.props.searchResults.filter(result => result.id === this.props.searchCard.id)
+    } else {
+    // ALL SEARCH RESULTS ARE RENDERED //
+    return this.props.searchResults
+    }
+  }
+
+  //////// FUNCTIONS TO RENDER PINS BASED ON TYPES ////////
 
   renderFriendsPinnedLocations = () => {
       return this.props.friendsPins.map(pin => {
@@ -107,7 +123,7 @@ class MapDisplay extends React.Component {
           <div>
             <Marker
               key={pin.id}
-              onClick={() => this.showCurrentMarker(pin)}
+              onClick={() => this.showCurrentMarkerInfo(pin)}
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               position={position}
@@ -141,7 +157,7 @@ class MapDisplay extends React.Component {
           <div>
             <Marker
               key={pin.id}
-              onClick={() => this.showCurrentMarker(pin)}
+              onClick={() => this.showCurrentMarkerInfo(pin)}
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               position={position}
@@ -168,23 +184,12 @@ class MapDisplay extends React.Component {
       })
   }
 
-  displayItem = () => {
-    if (this.props.currentMarker) {
-      return this.props.searchResults.filter(result => result.id === this.props.currentMarker.place.yelp_id)
-    } else if (this.props.searchCard){
-      return this.props.searchResults.filter(result => result.id === this.props.searchCard.id)
-    } else {
-    return this.props.searchResults
-    }
-  }
-
   renderSearchPins = () => {
-    return this.displayItem().map(location => {
+    return this.displaySearchResults().map(location => {
       const position = [location.coordinates.latitude, location.coordinates.longitude]
       return (
         <div>
           <Marker
-            onClick={null}
             onMouseOver={(e) => e.target.openPopup()}
             onMouseOut={(e) => e.target.closePopup()}
             key={location.id}
@@ -223,7 +228,7 @@ class MapDisplay extends React.Component {
         return (
           <div>
             <Marker
-              onClick={() => this.showCurrentMarker(pin)}
+              onClick={() => this.showCurrentMarkerInfo(pin)}
               onMouseOver={(e) => e.target.openPopup()}
               onMouseOut={(e) => e.target.closePopup()}
               key={pin.id}
@@ -256,10 +261,10 @@ class MapDisplay extends React.Component {
      return (
         <div>
           <div className="pinsContainer">
-            {this.props.currentMarker && !this.props.currentList ? <PinsContainer/> : null}
+            {this.props.currentMarker && !this.props.currentList ? <PinDetailsContainer/> : null}
           </div>
            <Map
-            onClick={this.hideCurrentMarker}
+            onClick={this.hideCurrentMarkerInfo}
             className='map'
             style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.mapLocation} zoom={this.props.mapZoom}
             zoomControl={false}>
@@ -276,7 +281,10 @@ class MapDisplay extends React.Component {
      )
    }
 
-}
+} //end of MapDisplayComponent
+
+
+// REDUX STATES AND DISPATCHES //
 
 function mapStateToProps(state) {
   return {
