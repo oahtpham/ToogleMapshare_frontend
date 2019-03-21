@@ -7,8 +7,10 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+
+//backend API 
+const listsURL ='https://tooglemapshare-app-api.herokuapp.com/api/v1/lists'
 
 class NewListForm extends React.Component {
 
@@ -40,7 +42,7 @@ class NewListForm extends React.Component {
       })
     )
     .then(() => {
-      fetch(`http://localhost:3000/api/v1/lists`, {
+      fetch(listsURL, {
         method: "POST",
         headers: {
           "Content-Type": 'application/json',

@@ -23,9 +23,9 @@ import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
 const yelpLogo = 'https://www.logolynx.com/images/logolynx/87/8724b62c2a14845bafd396ce6620d534.png'
-const placesURL = 'http://localhost:3000/api/v1/places'
-const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
-const listsURL = 'http://localhost:3000/api/v1/lists'
+const placesURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/places'
+const pinsURL ='https://tooglemapshare-app-api.herokuapp.com/api/v1/pinned_locations'
+const listsURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/lists'
 
 const styles = theme => ({
   card: {

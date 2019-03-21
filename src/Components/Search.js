@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import PinDetailsContainer from '../Containers/PinDetailsContainer'
 
@@ -7,14 +7,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
-import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 
-
-const searchUrl = 'http://localhost:3000/api/v1/yelp'
+const searchUrl = ' https://tooglemapshare-app-api.herokuapp.com/api/v1/yelp'
 
 const styles = {
   root: {

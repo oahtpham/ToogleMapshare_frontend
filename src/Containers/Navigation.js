@@ -34,11 +34,9 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Avatar from '@material-ui/core/Avatar';
-import Grid from '@material-ui/core/Grid';
 
 // backend API links
-const listsURL = 'http://localhost:3000/api/v1/lists'
-const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
+const listsURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/lists'
 
 const drawerWidth = 240;
 
@@ -282,7 +280,8 @@ class Navigation extends React.Component {
               noWrap>
               {this.props.currentList ? this.props.currentList.title : 'Toogle MapShare'}
             </Typography>
-            <Tooltip title={this.state.toggleSwitch ? "Hide Friends' Pins" : "Show Friends' Pins"}>
+            <Tooltip
+              title={this.state.toggleSwitch ? "Hide Friends' Pins" : "Show Friends' Pins"}>
               <Switch
                 checked={this.state.toggleSwitch}
                 onChange={this.handleSwitch}
@@ -290,7 +289,7 @@ class Navigation extends React.Component {
             </Tooltip>
             <div className={classes.grow} />
             <div className={classes.search} >
-             <div className={classes.searchIcon}>
+            <div className={classes.searchIcon}>
                <SearchIcon />
              </div>
              {this.props.currentList ?

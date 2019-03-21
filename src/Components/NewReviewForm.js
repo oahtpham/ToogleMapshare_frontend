@@ -7,14 +7,13 @@ import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider'
 import StarRatings from 'react-star-ratings'
 
 //backend API links
-const placesURL = 'http://localhost:3000/api/v1/places'
-const reviewsURL = 'http://localhost:3000/api/v1/reviews'
+const placesURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/places'
+const reviewsURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/reviews'
 
 class NewReviewForm extends React.Component {
 
@@ -111,7 +110,7 @@ class NewReviewForm extends React.Component {
       return (
         <div>
           <h4>{this.props.searchPin.name}</h4>
-          <img className="locationImage" src={this.props.searchPin.image_url}/><br/><br/>
+          <img alt="location" className="locationImage" src={this.props.searchPin.image_url}/><br/><br/>
           {this.props.searchPin.location.address1}<br/>
           {this.props.searchPin.location.city}, {this.props.searchPin.location.state}<br/> {this.props.searchPin.location.zip_code}
         </div>
@@ -120,7 +119,7 @@ class NewReviewForm extends React.Component {
       return (
         <div>
           <h4>{this.props.pin.place.name}</h4>
-          <img className="locationImage" src={this.props.pin.place.img_url}/><br/><br/>
+          <img alt="location" className="locationImage" src={this.props.pin.place.img_url}/><br/><br/>
           {this.props.pin.place.address}<br/>
           {this.props.pin.place.city}, {this.props.pin.place.state}<br/> {this.props.pin.place.zip_code}
         </div>

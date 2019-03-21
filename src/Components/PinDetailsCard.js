@@ -13,8 +13,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
 import Icon from '@material-ui/core/Icon';
 import GridListTile from '@material-ui/core/GridListTile';
 import ListSubheader from '@material-ui/core/ListSubheader';
@@ -23,8 +21,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 
 //backend API links
-const placesURL = 'http://localhost:3000/api/v1/places'
-const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
+const pinsURL ='https://tooglemapshare-app-api.herokuapp.com/api/v1//pinned_locations'
 
 const styles = theme => ({
   card: {

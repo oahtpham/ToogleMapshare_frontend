@@ -6,18 +6,12 @@ import PinDetailsContainer from './PinDetailsContainer'
 import { Map, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet'
 import L from 'leaflet';
 
-//material UI style imports
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import Icon from '@material-ui/core/Icon';
-
 import StarRatings from 'react-star-ratings'
 
 
-const placesURL = 'http://localhost:3000/api/v1/places'
-const pinsURL ='http://localhost:3000/api/v1/pinned_locations'
-const reviewsURL = 'http://localhost:3000/api/v1/reviews'
-const searchUrl = 'http://localhost:3000/api/v1/yelp'
+const pinsURL ='https://tooglemapshare-app-api.herokuapp.com/api/v1/pinned_locations'
+const reviewsURL = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/reviews'
+const searchUrl = 'https://tooglemapshare-app-api.herokuapp.com/api/v1/yelp'
 
 const redIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -129,7 +123,7 @@ class MapDisplay extends React.Component {
               position={position}
               icon={redIcon}>
               <Popup>
-                {pin.place.img_url ? <img className="locationImage" src={ pin.place.img_url}/> : null}
+                {pin.place.img_url ? <img alt="location" className="locationImage" src={ pin.place.img_url}/> : null}
                 <br/>
                 <h3>{pin.place.name}</h3>
                 <p>{pin.place.address}<br/>
@@ -163,7 +157,7 @@ class MapDisplay extends React.Component {
               position={position}
               icon={greenIcon }>
               <Popup>
-                {pin.place.img_url ? <img className="locationImage" src={ pin.place.img_url}/> : null}
+                {pin.place.img_url ? <img alt="location" className="locationImage" src={ pin.place.img_url}/> : null}
                 <br/>
                 <h3>{pin.place.name}</h3>
                 <p>{pin.place.address}<br/>
@@ -196,7 +190,7 @@ class MapDisplay extends React.Component {
             position={position}
             icon={this.props.currentListPins.filter(pin => pin.place.yelp_id === location.id).length === 0 ? blueIcon : greenIcon}>
             <Popup >
-              <img className="locationImage" src={location.image_url}/>
+              <img alt="location" className="locationImage" src={location.image_url}/>
               <br/>
               <h3>{location.name}</h3>
               <p>{location.location.address1}<br/>
@@ -235,7 +229,7 @@ class MapDisplay extends React.Component {
               position={position}
               icon={greenIcon}>
               <Popup >
-                <img className="locationImage" src={pin.place.img_url}/>
+                <img alt="location" className="locationImage" src={pin.place.img_url}/>
                 <br/>
                 <h3>{pin.place.name}</h3>
                 <p>{pin.place.address}<br/>
