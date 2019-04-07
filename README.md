@@ -31,13 +31,13 @@ User can create a new list for a specific location or view current lists in thei
 
 The search functionality uses the Yelp Fusion API to display the top 15 results based on the keyword entered. These results will display on the page in blue pins. Each result provides location details as well as the link to it's Yelp page. Clicking on the result card will then hide other pins and zoom in on the pin for that location. Users can choose to pin the result or add a review. 
 
-![search](public/toggle_search.gif)
+![search](public/toogle_search.gif)
 
 #### Toggle tool 
 
 User can choose to hide pins from other users to only display pins that they've created or are associated with their list. 
 
-![toggle](public/toogle.gif)
+![toggle](public/toggle.gif)
 
 ### Future Direction
 
