@@ -11,7 +11,9 @@
 ToogleMapshare was created with a Ruby on Rails backend with a PostgresSQL database and a React/Redux frontend. Additional frameworks and libraries used include:
 
 * [Leaflet](https://leafletjs.com/) - for mobile-friendly, interactive maps
-* [Material UI](https://material-ui.com/) - for the design pattern of the application
+* [Material UI](https://material-ui.com/) - design framework
+
+Github to backend can be found [here](https://github.com/oahtpham/ToogleMapshare_backendAPI)
 
 ### Key Features
 
@@ -21,7 +23,7 @@ A full demo video can be found [here](https://vimeo.com/326194696/e5d3488daa).
 
 User can search specific locations on a map to see the pins in the area. Based on the area searched, the map will zoom in accordingly and display pins at that location. Users can then hover over each pin to view the place or click on the pin for further details of who has pinned the place and any reviews left by friends. 
 
-The map zoom feature is handled by hitting the googlemaps API to find the longitude and latitude of the keyword location entered. This information is then taken to adjust the view area and zoom on the map. 
+The map zoom feature is handled by hitting the Google Map API to find the longitude and latitude of the keyword location entered. This information is then taken to adjust the view area and zoom on the map. 
 
 ![map](public/toogle_interactivemap.gif)
 
