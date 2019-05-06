@@ -260,7 +260,8 @@ class MapDisplay extends React.Component {
            <Map
             onClick={this.hideCurrentMarkerInfo}
             className='map'
-            style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.mapLocation} zoom={this.props.mapZoom}
+            style={{marginTop: '65px', height: '91vh', width: '100%'}} center={this.props.mapLocation}
+            zoom={this.props.mapZoom}
             zoomControl={false}>
              <TileLayer
                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'

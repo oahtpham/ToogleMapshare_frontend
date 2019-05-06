@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-//backend API 
+//backend API
 const listsURL ='https://tooglemapshare-app-api.herokuapp.com/api/v1/lists'
 
 class NewListForm extends React.Component {
@@ -58,6 +58,7 @@ class NewListForm extends React.Component {
       })
       .then(response => response.json())
       .then(obj => {
+        
         this.props.currentList(obj) //sets map to currentList
         this.props.addNewList(obj) //adds to dropdown lists in menu bar
         this.props.toggleListForm() //closes list dialog box
