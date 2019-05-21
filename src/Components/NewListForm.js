@@ -58,7 +58,6 @@ class NewListForm extends React.Component {
       })
       .then(response => response.json())
       .then(obj => {
-        
         this.props.currentList(obj) //sets map to currentList
         this.props.addNewList(obj) //adds to dropdown lists in menu bar
         this.props.toggleListForm() //closes list dialog box

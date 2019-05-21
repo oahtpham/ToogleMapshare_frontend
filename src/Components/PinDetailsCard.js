@@ -69,8 +69,8 @@ class PinDetailsCard extends React.Component {
     .then(resp => {
       if (resp.ok) {
         const newAllPins = this.props.allPins.filter(pin => pin.id !== deletePin.id)
-        this.props.setAllPins(newAllPins)
         const newCurrentListPins = this.props.currentListPins.filter(pin => pin.id !== deletePin.id)
+        this.props.setAllPins(newAllPins)
         this.props.setCurrentListPins(newCurrentListPins)
       }
     })

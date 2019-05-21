@@ -317,7 +317,7 @@ class Navigation extends React.Component {
             >
               <Avatar
                 alt="User"
-                src="https://media.licdn.com/dms/image/C4D03AQElaK3Pw6r77g/profile-displayphoto-shrink_200_200/0?e=1556755200&v=beta&t=OeJHYI4ySZDH9Hp4SSkAbCX1CjJ4jwl0DEpti3p_OYQ" className={classes.smallAvatar} />
+                src="../linkedinpic.jpeg" className={classes.smallAvatar} />
           </IconButton>
           </Toolbar>
         </AppBar>
