@@ -230,7 +230,7 @@ class Navigation extends React.Component {
 
   handleSearch = (e) => {
     if (e.key === "Enter") {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${this.state.searchLocation}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${this.state.searchLocation}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`) // uses google api to find long and lat to insert into yelp search
       .then(response => response.json())
       .then(geolocation => {
         this.setState({
