@@ -110,6 +110,7 @@ class MapDisplay extends React.Component {
 
   //////// FUNCTIONS TO RENDER PINS BASED ON TYPES ////////
 
+  //these pins are displayed as pink pins on the page
   renderFriendsPinnedLocations = () => {
       return this.props.friendsPins.map(pin => {
         const position = [pin.place.latitude, pin.place.longitude]
@@ -144,6 +145,7 @@ class MapDisplay extends React.Component {
       })
   }
 
+  // these are displayed as green pins on the page
   renderUserPinnedLocations = () => {
       return this.props.userPins.map(pin => {
         const position = [pin.place.latitude, pin.place.longitude]
@@ -178,6 +180,7 @@ class MapDisplay extends React.Component {
       })
   }
 
+  //these search pins display as bue pins on the page
   renderSearchPins = () => {
     return this.displaySearchResults().map(location => {
       const position = [location.coordinates.latitude, location.coordinates.longitude]
